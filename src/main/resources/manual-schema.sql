@@ -1,0 +1,57 @@
+CREATE EXTENSION IF NOT EXISTS "pgcrypto";
+
+ALTER DATABASE "remedy-db"
+SET
+  TIMEZONE TO 'Asia/Kuwait';
+
+-- Enum for bag state
+CREATE TYPE bag_state AS ENUM(
+  'unsealed',
+  'sealed',
+  'loaded',
+  'dispensed',
+  'discarded'
+);
+
+-- Enum for medication history action
+CREATE TYPE history_action AS ENUM('dispensed', 'discarded');
+
+-- Prescribers
+CREATE TABLE prescribers (
+                             id UUID PRIMARY KEY DEFAULT gen_random_uuid (),
+                             name VARCHAR(100) NOT NULL,
+                             email VARCHAR(255) UNIQUE NOT NULL,
+                             password VARCHAR(255) NOT NULL
+
+);
+
+-- Patients
+CREATE TABLE patients (
+                          id UUID PRIMARY KEY DEFAULT gen_random_uuid (),
+                          prescriber_id UUID REFERENCES prescribers (id),
+                          name VARCHAR(100) NOT NULL,
+                          dob DATE NOT NULL,
+                          email VARCHAR(255) UNIQUE NOT NULL,
+                          phone VARCHAR(20),
+                          password VARCHAR(255) NOT NULL,
+                          face_image_path TEXT);
+
+-- Bags
+CREATE TABLE bags (
+                      id UUID PRIMARY KEY DEFAULT gen_random_uuid (),
+                      patient_id UUID REFERENCES patients (id),
+                      prescription TEXT NOT NULL,
+                      state bag_state NOT NULL,
+                      created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Medication History
+CREATE TABLE medication_history (
+                                    id UUID PRIMARY KEY DEFAULT gen_random_uuid (),
+                                    bag_id UUID REFERENCES bags (id) ON DELETE CASCADE,
+                                    patient_id UUID REFERENCES patients (id) ON DELETE CASCADE,
+                                    prescriber_id UUID REFERENCES prescribers (id) ON DELETE SET NULL,
+                                    action history_action NOT NULL,
+                                    prescription_copy TEXT NOT NULL,
+                                    TIMESTAMP TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+);
