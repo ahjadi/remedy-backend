@@ -16,7 +16,7 @@ data class PatientEntity(
     @GeneratedValue(strategy = GenerationType.AUTO)
     val id: UUID? = null,
 
-    var prescriptionId: UUID? = null,
+    var prescriberId: UUID? = null,
 
     var name: String,
     var dob: LocalDate,
