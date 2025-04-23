@@ -16,6 +16,8 @@ import org.springframework.web.server.ResponseStatusException
 class PrescriberController (private val prescriberService: PrescriberService) {
 
 
+    // Create new prescriber user
+    // DB has unique email constraint - need to make a global exception handler to make error more expressive
     @PostMapping("/create")
     fun createNewPrescriber(@RequestBody prescriberRequest: PrescriberRequest) : Any {
         prescriberService.createPrescriber(prescriberRequest)
