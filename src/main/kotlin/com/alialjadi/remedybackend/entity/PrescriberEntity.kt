@@ -18,5 +18,7 @@ data class PrescriberEntity(
     var name: String,
     var email: String,
     var password: String,
+
+    val role: String = "PRESCRIBER"
 ) {
 }

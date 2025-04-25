@@ -25,4 +25,6 @@ data class PatientEntity(
     var password: String,
     var faceImagePath: String? = null,
 
+    val role: String = "PATIENT"
+
     )

@@ -55,3 +55,11 @@ CREATE TABLE medication_history (
                                     prescription_copy TEXT NOT NULL,
                                     TIMESTAMP TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Add role to prescribers
+ALTER TABLE prescribers
+    ADD COLUMN role VARCHAR(50) NOT NULL DEFAULT 'PRESCRIBER';
+
+-- Add role to patients
+ALTER TABLE patients
+    ADD COLUMN role VARCHAR(50) NOT NULL DEFAULT 'PATIENT';
