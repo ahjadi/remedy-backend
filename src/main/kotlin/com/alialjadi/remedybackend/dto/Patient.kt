@@ -12,3 +12,10 @@ data class PatientRequest(
     var password: String,
     var faceImagePath: String? = null,
 )
+
+data class PatientSummary(
+    val id: UUID?,
+    val name: String,
+    val dob: LocalDate,
+    val phone: String?
+)

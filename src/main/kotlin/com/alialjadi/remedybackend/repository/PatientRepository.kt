@@ -8,4 +8,5 @@ import java.util.UUID
 @Repository
 interface PatientRepository : JpaRepository<PatientEntity, UUID> {
     fun findByEmail(email: String): PatientEntity?
+    fun findAllByPrescriberId(prescriberId: UUID): List<PatientEntity?>
 }
