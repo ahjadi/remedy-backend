@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.server.ResponseStatusException
 
 @RestController
-@RequestMapping("/api/prescribers")
+@RequestMapping("/api/prescriber")
 class PrescriberController (private val prescriberService: PrescriberService) {
 
 

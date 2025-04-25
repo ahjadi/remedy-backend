@@ -1,5 +1,6 @@
 package com.alialjadi.remedybackend.authentication
 
+import com.alialjadi.remedybackend.authentication.device.DeviceApiKeyFilter
 import com.alialjadi.remedybackend.authentication.jwt.JwtAuthenticationFilter
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -20,7 +21,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 class SecurityConfig(
     private val jwtAuthFilter: JwtAuthenticationFilter,
-    private val userDetailsService: UserDetailsService
+    private val userDetailsService: UserDetailsService,
+    private val deviceApiKeyFilter: DeviceApiKeyFilter
 ) {
     // For authorization you need to add code in security config, customuserdetails, and jwtservice
     @Bean
@@ -31,9 +33,11 @@ class SecurityConfig(
 //                    .anyRequest().permitAll()  // permit all
 
                     .requestMatchers(
-                        "/auth/**",
+                        "/auth/login",
                         "/api/prescribers/create", "/api/patients/create"
                     ).permitAll()
+                    // Device endpoints - require ROLE_DEVICE
+                    .requestMatchers("/api/device/**").hasRole("DEVICE")
                     .anyRequest()
                     .authenticated()
             }
@@ -41,7 +45,11 @@ class SecurityConfig(
                 it.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             }
             .authenticationProvider(authenticationProvider())
+            // JWT filter for patient/doctor authentication
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter::class.java)
+            // API key filter for device authentication
+            .addFilterBefore(deviceApiKeyFilter, UsernamePasswordAuthenticationFilter::class.java)
+
 
         return http.build()
     }
