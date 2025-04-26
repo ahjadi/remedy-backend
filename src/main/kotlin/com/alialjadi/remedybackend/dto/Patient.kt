@@ -1,5 +1,6 @@
 package com.alialjadi.remedybackend.dto
 
+import org.jetbrains.annotations.NotNull
 import java.time.LocalDate
 import java.util.UUID
 
@@ -21,6 +22,8 @@ data class PatientSummary(
 )
 
 data class PatientIdRequest(
+    @field:
+    NotNull("Patient ID is required")
     val patientId: UUID,
 )
 

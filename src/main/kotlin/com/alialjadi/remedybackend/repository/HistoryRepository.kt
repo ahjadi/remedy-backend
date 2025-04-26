@@ -9,4 +9,5 @@ import java.util.UUID
 interface HistoryRepository : JpaRepository<HistoryEntity, UUID> {
     fun findByPrescriberId(prescriberId: UUID): List<HistoryEntity>
     fun findByPatientId(patientId: UUID): List<HistoryEntity>
+    fun findAllByPatientId(patientId: UUID): List<HistoryEntity>
 }

@@ -3,26 +3,22 @@ package com.alialjadi.remedybackend.controller
 import com.alialjadi.remedybackend.authentication.UserPrincipal
 import com.alialjadi.remedybackend.dto.*
 import com.alialjadi.remedybackend.entity.BagEntity
-import com.alialjadi.remedybackend.entity.HistoryEntity
 import com.alialjadi.remedybackend.service.MedicationHistoryService
 import com.alialjadi.remedybackend.service.PrescriberService
 import jakarta.persistence.EntityNotFoundException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.annotation.AuthenticationPrincipal
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/api/prescriber")
 class PrescriberController(
     private val prescriberService: PrescriberService,
-    private val historyService: MedicationHistoryService, ) {
+    private val historyService: MedicationHistoryService,
+) {
 
-
+    // TODO make endpoint for each entity just in case. make an endpoint for recurring prescription
     // Create new prescriber user
     // DB has unique email constraint - need to make a global exception handler to make error more expressive
     @PostMapping("/create")
@@ -41,20 +37,20 @@ class PrescriberController(
         return try {
             ResponseEntity.ok()
                 .body(prescriberService.assignPatientToPrescriber(assignedPrescriber))
-        } catch (e: EntityNotFoundException){
+        } catch (e: EntityNotFoundException) {
             ResponseEntity.status(HttpStatus.NOT_FOUND).body(mapOf("error" to "${e.message}"))
         }
     }
 
     // Retrieve all bags for a specific prescriber
     @GetMapping("/patient/bags")
-    fun retrieveAllBags(@AuthenticationPrincipal principalId : UserPrincipal): List<BagEntity> {
+    fun retrieveAllBags(@AuthenticationPrincipal principalId: UserPrincipal): List<BagEntity> {
         return prescriberService.retrieveAllBags(principalId.getPrescriberId())
     }
 
     // Retrieve all unsealed bags for a specific prescriber
     @GetMapping("/patient/unsealed/bags")
-    fun retrieveAllUnsealedBags(@AuthenticationPrincipal principalId : UserPrincipal): List<BagEntity> {
+    fun retrieveAllUnsealedBags(@AuthenticationPrincipal principalId: UserPrincipal): List<BagEntity> {
         return prescriberService.retrieveAllUnsealedBags(principalId.getPrescriberId())
     }
 
@@ -130,8 +126,9 @@ class PrescriberController(
 
 
     @PostMapping("/patient/prescriptions/history")
-    fun getPatientPrescriptionHistory(patientId: PatientIdRequest): ResponseEntity<List<HistoryEntity>> {
-        return ResponseEntity.ok(historyService.getHistoryByPatient(patientId.patientId))
+    fun getPatientPrescriptionHistory(@RequestBody patientId: PatientIdRequest): Any {
+
+        return ResponseEntity.ok().body(historyService.getPreviousPrescriptionRecords(patientId.patientId))
     }
 
 
