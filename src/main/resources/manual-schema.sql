@@ -63,3 +63,11 @@ ALTER TABLE prescribers
 -- Add role to patients
 ALTER TABLE patients
     ADD COLUMN role VARCHAR(50) NOT NULL DEFAULT 'PATIENT';
+
+
+-- First, modify bags table to change the state column to VARCHAR
+ALTER TABLE bags
+    ALTER COLUMN state TYPE VARCHAR(20);
+
+-- Then drop the enum type (optional, only if you want to completely remove it)
+DROP TYPE bag_state;

@@ -38,6 +38,8 @@ class SecurityConfig(
                     ).permitAll()
                     // Device endpoints - require ROLE_DEVICE
                     .requestMatchers("/api/device/**").hasRole("DEVICE")
+                    .requestMatchers("/api/prescriber/**").hasRole("PRESCRIBER")
+                    .requestMatchers("/api/patient/**").hasRole("PATIENT")
                     .anyRequest()
                     .authenticated()
             }

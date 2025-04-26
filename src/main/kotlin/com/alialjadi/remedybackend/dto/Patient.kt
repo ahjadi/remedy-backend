@@ -19,3 +19,7 @@ data class PatientSummary(
     val dob: LocalDate,
     val phone: String?
 )
+
+data class PatientIdRequest(
+    val patientId: UUID,
+)

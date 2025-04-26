@@ -35,7 +35,7 @@ class DeviceApiKeyFilter(
         val apiKey = request.getHeader("X-API-Key")
 
         if (apiKey == validApiKey) {
-            // Set authentication with DEVICE role
+            // Set authentication with a DEVICE role
             val authorities = listOf(SimpleGrantedAuthority("ROLE_DEVICE"))
             val authentication = PreAuthenticatedAuthenticationToken("device", null, authorities)
             SecurityContextHolder.getContext().authentication = authentication
