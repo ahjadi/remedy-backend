@@ -2,11 +2,13 @@ package com.alialjadi.remedybackend.controller
 
 import com.alialjadi.remedybackend.authentication.UserPrincipal
 import com.alialjadi.remedybackend.dto.*
+import com.alialjadi.remedybackend.entity.BagEntity
 import com.alialjadi.remedybackend.service.PrescriberAndBagService
 import jakarta.persistence.EntityNotFoundException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.annotation.AuthenticationPrincipal
+import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -14,7 +16,8 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("/api/prescriber")
-class PrescriberController(private val prescriberService: PrescriberAndBagService) {
+class PrescriberController(
+    private val prescriberService: PrescriberAndBagService, ) {
 
 
     // Create new prescriber user
@@ -39,6 +42,19 @@ class PrescriberController(private val prescriberService: PrescriberAndBagServic
             ResponseEntity.status(HttpStatus.NOT_FOUND).body(mapOf("error" to "${e.message}"))
         }
     }
+
+    // Retrieve all bags for a specific prescriber
+    @GetMapping("/patient/bags")
+    fun retrieveAllBags(@AuthenticationPrincipal principalId : UserPrincipal): List<BagEntity> {
+        return prescriberService.retrieveAllBags(principalId.getPrescriberId())
+    }
+
+    // Retrieve all unsealed bags for a specific prescriber
+    @GetMapping("/patient/unsealed/bags")
+    fun retrieveAllUnsealedBags(@AuthenticationPrincipal principalId : UserPrincipal): List<BagEntity> {
+        return prescriberService.retrieveAllUnsealedBags(principalId.getPrescriberId())
+    }
+
 
     // views all patients of a prescriber
     @PostMapping("/patients/list")

@@ -2,6 +2,7 @@ package com.alialjadi.remedybackend.service
 
 import com.alialjadi.remedybackend.dto.*
 import com.alialjadi.remedybackend.entity.BagEntity
+import com.alialjadi.remedybackend.entity.BagState
 import com.alialjadi.remedybackend.entity.PrescriberEntity
 import com.alialjadi.remedybackend.repository.BagRepository
 import com.alialjadi.remedybackend.repository.PatientRepository
@@ -18,6 +19,23 @@ class PrescriberAndBagService(
     private val patientRepository: PatientRepository,
     private val bagRepository: BagRepository,
 ) {
+
+    // Retrieve all bags assigned to a prescriber == A list of bags
+    fun retrieveAllBags(prescriberId: UUID?) : List<BagEntity> {
+
+        val patientIds = patientRepository.findAllByPrescriberId(prescriberId!!).map { it!!.id }
+        val bags = bagRepository.findAllByPatientIdIn(patientIds)
+
+        return bags
+    }
+
+    // Retrieve all unsealed bags assigned to a prescriber == A list of bags
+    fun retrieveAllUnsealedBags(prescriberId: UUID?) : List<BagEntity> {
+
+        val patientIds = patientRepository.findAllByPrescriberId(prescriberId!!).map { it!!.id }
+        val unsealedBags = bagRepository.findAllByPatientIdIn(patientIds).filter { it.state == BagState.UNSEALED }
+        return unsealedBags
+    }
 
     // for prescriber
     fun createPrescriber(prescriber: PrescriberRequest) {

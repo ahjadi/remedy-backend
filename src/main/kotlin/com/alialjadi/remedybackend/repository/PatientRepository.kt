@@ -9,4 +9,5 @@ import java.util.UUID
 interface PatientRepository : JpaRepository<PatientEntity, UUID> {
     fun findByEmail(email: String): PatientEntity?
     fun findAllByPrescriberId(prescriberId: UUID): List<PatientEntity?>
+    fun findIdsByPrescriberId(prescriberId: UUID): List<UUID>
 }
