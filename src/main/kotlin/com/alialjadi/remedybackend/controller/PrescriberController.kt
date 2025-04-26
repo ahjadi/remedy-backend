@@ -6,14 +6,11 @@ import com.alialjadi.remedybackend.service.PrescriberAndBagService
 import jakarta.persistence.EntityNotFoundException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
-import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
-import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import java.util.*
 
 @RestController
 @RequestMapping("/api/prescriber")
@@ -24,8 +21,23 @@ class PrescriberController(private val prescriberService: PrescriberAndBagServic
     // DB has unique email constraint - need to make a global exception handler to make error more expressive
     @PostMapping("/create")
     fun createNewPrescriber(@RequestBody prescriber: PrescriberRequest): ResponseEntity<Any> {
-        prescriberService.createPrescriber(prescriber)
-        return ResponseEntity.ok().body("Prescriber created")
+        return try {
+            prescriberService.createPrescriber(prescriber)
+            ResponseEntity.ok().body("Prescriber created")
+        } catch (e: Exception) {
+            ResponseEntity.badRequest().body("Email already in use or ${e.message}")
+        }
+    }
+
+    @PostMapping("/patient/assign")
+    fun assignPrescriber(@RequestBody assignedPrescriber: AssignPrescriber): ResponseEntity<Any> {
+
+        return try {
+            ResponseEntity.ok()
+                .body(prescriberService.assignPatientToPrescriber(assignedPrescriber))
+        } catch (e: EntityNotFoundException){
+            ResponseEntity.status(HttpStatus.NOT_FOUND).body(mapOf("error" to "${e.message}"))
+        }
     }
 
     // views all patients of a prescriber
@@ -80,7 +92,7 @@ class PrescriberController(private val prescriberService: PrescriberAndBagServic
     @PostMapping("/patient/bag/view")
     fun viewPatientAndBag(@RequestBody patientId: PatientIdRequest): ResponseEntity<Any> {
         return try {
-            ResponseEntity.ok().body( prescriberService.viewBag(patientId))
+            ResponseEntity.ok().body(prescriberService.viewBag(patientId))
         } catch (e: EntityNotFoundException) {
             ResponseEntity.status(HttpStatus.NOT_FOUND).body(mapOf("error" to e.message))
         }
@@ -93,7 +105,8 @@ class PrescriberController(private val prescriberService: PrescriberAndBagServic
         return try {
             ResponseEntity.ok().body(prescriberService.getState(patientId))
         } catch (e: EntityNotFoundException) {
-        ResponseEntity.status(HttpStatus.NOT_FOUND).body(mapOf("error" to e.message))}
+            ResponseEntity.status(HttpStatus.NOT_FOUND).body(mapOf("error" to e.message))
+        }
     }
 
 

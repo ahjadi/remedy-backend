@@ -4,7 +4,7 @@ import java.time.LocalDate
 import java.util.UUID
 
 data class PatientRequest(
-    var prescriberId: UUID,
+    var prescriberId: UUID? = null,
     var name: String,
     var dob: LocalDate,
     var email: String,
@@ -23,3 +23,4 @@ data class PatientSummary(
 data class PatientIdRequest(
     val patientId: UUID,
 )
+

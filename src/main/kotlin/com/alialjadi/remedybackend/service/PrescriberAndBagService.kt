@@ -2,7 +2,6 @@ package com.alialjadi.remedybackend.service
 
 import com.alialjadi.remedybackend.dto.*
 import com.alialjadi.remedybackend.entity.BagEntity
-import com.alialjadi.remedybackend.entity.BagState
 import com.alialjadi.remedybackend.entity.PrescriberEntity
 import com.alialjadi.remedybackend.repository.BagRepository
 import com.alialjadi.remedybackend.repository.PatientRepository
@@ -82,7 +81,7 @@ class PrescriberAndBagService(
 
     }
 
-    // for prescriber: returns info of patient and their bag TODO(controller)
+    // for prescriber: returns info of patient and their bag
     fun viewBag(patientId: PatientIdRequest): PatientAndTheirBagSummary {
 
         val patient = patientRepository.findById(patientId.patientId)
@@ -111,7 +110,15 @@ class PrescriberAndBagService(
     }
 
     // for prescriber TODO
-    fun assignToOtherPrescriber() {
+    fun assignPatientToPrescriber(prescriberToPatient: AssignPrescriber) {
+
+        val prescriber = prescriberRepository.findById(prescriberToPatient.prescriberId)
+            .orElseThrow { EntityNotFoundException("No prescriber found for ${prescriberToPatient.prescriberId}") }
+        val patient = patientRepository.findById(prescriberToPatient.patientId)
+            .orElseThrow { EntityNotFoundException("No patient found for ${prescriberToPatient.patientId}") }
+
+        patient.prescriberId = prescriberToPatient.prescriberId
+        patientRepository.save(patient)
     }
 
 

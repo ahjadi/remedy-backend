@@ -34,7 +34,7 @@ class SecurityConfig(
 
                     .requestMatchers(
                         "/auth/login",
-                        "/api/prescribers/create", "/api/patients/create"
+                        "/api/prescriber/create", "/api/patient/create"
                     ).permitAll()
                     // Device endpoints - require ROLE_DEVICE
                     .requestMatchers("/api/device/**").hasRole("DEVICE")
