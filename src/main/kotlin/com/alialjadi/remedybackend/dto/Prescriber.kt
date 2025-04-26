@@ -11,3 +11,7 @@ data class AssignPrescriber(
     val patientId: UUID,
     val prescriberId: UUID,
 )
+
+data class PrescriberIdRequest(
+    val prescriberId: UUID,
+)

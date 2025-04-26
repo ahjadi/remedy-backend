@@ -22,8 +22,6 @@ data class PatientSummary(
 )
 
 data class PatientIdRequest(
-    @field:
-    NotNull("Patient ID is required")
     val patientId: UUID,
 )
 

@@ -11,7 +11,6 @@ import jakarta.persistence.EntityNotFoundException
 import jakarta.transaction.Transactional
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
-import java.nio.file.attribute.UserPrincipal
 import java.util.*
 
 @Service
@@ -104,22 +103,10 @@ class PrescriberService(
         val updatedBag = bagRepository.save(bag)
 
         if (originalState != newBageState.bagState) {
-            historyService.recordStateChange(updatedBag, newBageState.bagState, newBageState.prescriberId )
+            historyService.recordStateChange(updatedBag, newBageState.bagState, newBageState.prescriberId)
         }
 
     }
-
-//
-//    // for prescriber and device: updates the state of the bag
-//    fun setBagState(newBageState: SetBagState) {
-//
-//        val bag = bagRepository.findByPatientId(newBageState.patientId)
-//            ?: throw EntityNotFoundException("No bag found for patient id ${newBageState.patientId}")
-//
-//        bag.state = newBageState.bagState
-//        bagRepository.save(bag)
-//
-//    }
 
 
     // for prescriber: returns info of patient and their bag
@@ -160,6 +147,13 @@ class PrescriberService(
 
         patient.prescriberId = prescriberToPatient.prescriberId
         patientRepository.save(patient)
+    }
+
+    fun retrievePrescriber(prescriberId: UUID): PrescriberEntity? {
+        val prescriber = prescriberRepository.findById(prescriberId)
+            .orElseThrow { EntityNotFoundException("No Prescriber found for id $prescriberId") }
+
+        return prescriber
     }
 
 
