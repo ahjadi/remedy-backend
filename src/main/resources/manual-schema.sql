@@ -71,3 +71,11 @@ ALTER TABLE bags
 
 -- Then drop the enum type (optional, only if you want to completely remove it)
 DROP TYPE bag_state;
+
+
+
+-- Modify the medication_history table to use VARCHAR for action
+ALTER TABLE medication_history
+    ALTER COLUMN action TYPE VARCHAR(20);
+-- drop the existing enum type
+DROP TYPE history_action;

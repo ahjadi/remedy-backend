@@ -8,20 +8,23 @@ import com.alialjadi.remedybackend.repository.BagRepository
 import com.alialjadi.remedybackend.repository.PatientRepository
 import com.alialjadi.remedybackend.repository.PrescriberRepository
 import jakarta.persistence.EntityNotFoundException
+import jakarta.transaction.Transactional
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
+import java.nio.file.attribute.UserPrincipal
 import java.util.*
 
 @Service
-class PrescriberAndBagService(
+class PrescriberService(
     private val prescriberRepository: PrescriberRepository,
     private val passwordEncoder: PasswordEncoder,
     private val patientRepository: PatientRepository,
     private val bagRepository: BagRepository,
+    private val historyService: MedicationHistoryService
 ) {
 
     // Retrieve all bags assigned to a prescriber == A list of bags
-    fun retrieveAllBags(prescriberId: UUID?) : List<BagEntity> {
+    fun retrieveAllBags(prescriberId: UUID?): List<BagEntity> {
 
         val patientIds = patientRepository.findAllByPrescriberId(prescriberId!!).map { it!!.id }
         val bags = bagRepository.findAllByPatientIdIn(patientIds)
@@ -30,7 +33,7 @@ class PrescriberAndBagService(
     }
 
     // Retrieve all unsealed bags assigned to a prescriber == A list of bags
-    fun retrieveAllUnsealedBags(prescriberId: UUID?) : List<BagEntity> {
+    fun retrieveAllUnsealedBags(prescriberId: UUID?): List<BagEntity> {
 
         val patientIds = patientRepository.findAllByPrescriberId(prescriberId!!).map { it!!.id }
         val unsealedBags = bagRepository.findAllByPatientIdIn(patientIds).filter { it.state == BagState.UNSEALED }
@@ -89,15 +92,35 @@ class PrescriberAndBagService(
     }
 
     // for prescriber and device: updates the state of the bag
+    @Transactional
     fun setBagState(newBageState: SetBagState) {
 
         val bag = bagRepository.findByPatientId(newBageState.patientId)
             ?: throw EntityNotFoundException("No bag found for patient id ${newBageState.patientId}")
 
+        val originalState = bag.state
         bag.state = newBageState.bagState
-        bagRepository.save(bag)
+
+        val updatedBag = bagRepository.save(bag)
+
+        if (originalState != newBageState.bagState) {
+            historyService.recordStateChange(updatedBag, newBageState.bagState, newBageState.prescriberId )
+        }
 
     }
+
+//
+//    // for prescriber and device: updates the state of the bag
+//    fun setBagState(newBageState: SetBagState) {
+//
+//        val bag = bagRepository.findByPatientId(newBageState.patientId)
+//            ?: throw EntityNotFoundException("No bag found for patient id ${newBageState.patientId}")
+//
+//        bag.state = newBageState.bagState
+//        bagRepository.save(bag)
+//
+//    }
+
 
     // for prescriber: returns info of patient and their bag
     fun viewBag(patientId: PatientIdRequest): PatientAndTheirBagSummary {

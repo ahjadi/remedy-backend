@@ -17,8 +17,11 @@ data class UpdatePrescription(
 
 data class SetBagState(
     val patientId: UUID,
+    val prescriberId: UUID,
     val bagState: BagState
 )
+
+
 
 data class PatientBagState(
     val bagState: BagState

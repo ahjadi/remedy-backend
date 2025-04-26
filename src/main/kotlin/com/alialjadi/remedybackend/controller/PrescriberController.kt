@@ -3,7 +3,9 @@ package com.alialjadi.remedybackend.controller
 import com.alialjadi.remedybackend.authentication.UserPrincipal
 import com.alialjadi.remedybackend.dto.*
 import com.alialjadi.remedybackend.entity.BagEntity
-import com.alialjadi.remedybackend.service.PrescriberAndBagService
+import com.alialjadi.remedybackend.entity.HistoryEntity
+import com.alialjadi.remedybackend.service.MedicationHistoryService
+import com.alialjadi.remedybackend.service.PrescriberService
 import jakarta.persistence.EntityNotFoundException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -17,7 +19,8 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @RequestMapping("/api/prescriber")
 class PrescriberController(
-    private val prescriberService: PrescriberAndBagService, ) {
+    private val prescriberService: PrescriberService,
+    private val historyService: MedicationHistoryService, ) {
 
 
     // Create new prescriber user
@@ -123,6 +126,12 @@ class PrescriberController(
         } catch (e: EntityNotFoundException) {
             ResponseEntity.status(HttpStatus.NOT_FOUND).body(mapOf("error" to e.message))
         }
+    }
+
+
+    @PostMapping("/patient/prescriptions/history")
+    fun getPatientPrescriptionHistory(patientId: PatientIdRequest): ResponseEntity<List<HistoryEntity>> {
+        return ResponseEntity.ok(historyService.getHistoryByPatient(patientId.patientId))
     }
 
 
