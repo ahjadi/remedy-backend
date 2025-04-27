@@ -1,5 +1,7 @@
 package com.alialjadi.remedybackend.entity
 
+import com.alialjadi.remedybackend.encryption.EncryptedStringConverter
+import jakarta.persistence.Convert
 import jakarta.persistence.Entity
 import jakarta.persistence.EnumType
 import jakarta.persistence.Enumerated
@@ -26,6 +28,7 @@ data class HistoryEntity(
     @Enumerated(EnumType.STRING)
     val action: BagState,
 
+    @Convert(converter = EncryptedStringConverter::class)
     val prescriptionCopy: String,
 
     val timestamp: Instant = Instant.now(),

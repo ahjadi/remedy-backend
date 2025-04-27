@@ -143,7 +143,7 @@ class PrescriberController(
         }
     }
 
-    // TODO THIS MUST BE DELETED | it is here JIC
+
     @PostMapping("/retrieve/prescriber")
     fun retrievePrescriber(@RequestBody prescriberId: PrescriberIdRequest): ResponseEntity<Any> {
         return try {

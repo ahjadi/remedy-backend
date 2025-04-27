@@ -25,3 +25,18 @@ data class PatientIdRequest(
     val patientId: UUID,
 )
 
+data class PatientVerbose(
+    val patientId: UUID,
+    val prescriberId: UUID? = null,
+    val patientName: String,
+    val patientEmail: String,
+    val patientPhone: String,
+    val patientFaceImagePath: String? = null,
+
+)
+
+data class PhotoUploadRequest(
+    val patientId: UUID,
+    val photoPath: String
+)
+

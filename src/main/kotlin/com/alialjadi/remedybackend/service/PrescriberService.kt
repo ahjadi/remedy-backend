@@ -149,11 +149,17 @@ class PrescriberService(
         patientRepository.save(patient)
     }
 
-    fun retrievePrescriber(prescriberId: UUID): PrescriberEntity? {
+    fun retrievePrescriber(prescriberId: UUID): PrescriberVerbose? {
         val prescriber = prescriberRepository.findById(prescriberId)
             .orElseThrow { EntityNotFoundException("No Prescriber found for id $prescriberId") }
 
-        return prescriber
+        val prescriberData = PrescriberVerbose(
+            prescriberId = prescriber.id!!,
+            prescriberName = prescriber.name,
+            prescriberEmail = prescriber.email,
+        )
+
+        return prescriberData
     }
 
 

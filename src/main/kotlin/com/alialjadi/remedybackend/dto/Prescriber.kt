@@ -15,3 +15,10 @@ data class AssignPrescriber(
 data class PrescriberIdRequest(
     val prescriberId: UUID,
 )
+
+data class PrescriberVerbose(
+    val prescriberId: UUID,
+    val prescriberName: String,
+    val prescriberEmail: String,
+
+)

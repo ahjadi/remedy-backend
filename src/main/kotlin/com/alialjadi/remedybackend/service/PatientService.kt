@@ -1,6 +1,8 @@
 package com.alialjadi.remedybackend.service
 
 import com.alialjadi.remedybackend.dto.PatientRequest
+import com.alialjadi.remedybackend.dto.PatientVerbose
+import com.alialjadi.remedybackend.dto.PhotoUploadRequest
 import com.alialjadi.remedybackend.entity.PatientEntity
 import com.alialjadi.remedybackend.repository.PatientRepository
 import jakarta.persistence.EntityNotFoundException
@@ -28,8 +30,27 @@ class PatientService(
         patientRepository.save(newPatientEntity)
     }
 
-    fun retrievePatient(patientId: UUID): PatientEntity {
-        return patientRepository.findById(patientId)
+    fun retrievePatient(patientId: UUID): PatientVerbose {
+        val patient = patientRepository.findById(patientId)
             .orElseThrow { EntityNotFoundException("No patient found for id $patientId") }
+
+        return PatientVerbose(
+            patientId = patient.id!!,
+            prescriberId = patient.prescriberId,
+            patientName = patient.name,
+            patientEmail = patient.email,
+            patientPhone = patient.phone,
+            patientFaceImagePath = patient.faceImagePath,
+        )
+    }
+
+    fun uploadPhoto(request: PhotoUploadRequest) {
+
+        val patient = patientRepository.findById(request.patientId)
+            .orElseThrow { EntityNotFoundException("No patient found for id ${request.patientId}") }
+
+       patient.faceImagePath = request.photoPath
+
+        patientRepository.save(patient)
     }
 }

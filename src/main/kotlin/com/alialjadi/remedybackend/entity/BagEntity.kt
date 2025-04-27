@@ -1,5 +1,6 @@
 package com.alialjadi.remedybackend.entity
 
+import com.alialjadi.remedybackend.encryption.EncryptedStringConverter
 import jakarta.persistence.AttributeConverter
 import jakarta.persistence.Column
 import jakarta.persistence.Convert
@@ -23,6 +24,8 @@ data class BagEntity(
     val id: UUID? = null,
 
     val patientId: UUID? = null,
+
+    @Convert(converter = EncryptedStringConverter::class)
     var prescription: String,
 
     @Enumerated(EnumType.STRING)

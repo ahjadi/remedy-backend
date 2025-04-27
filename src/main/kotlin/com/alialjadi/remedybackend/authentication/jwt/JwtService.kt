@@ -1,14 +1,11 @@
 package com.alialjadi.remedybackend.authentication.jwt
 
+import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.security.Keys
 import org.springframework.stereotype.Component
-import java.util.Date
-import javax.crypto.SecretKey
-
-import io.jsonwebtoken.*
-import org.springframework.beans.factory.annotation.Value
 import java.util.*
+import javax.crypto.SecretKey
 
 
 @Component
@@ -17,7 +14,8 @@ class JwtService {
     // Load secret key from environment variable
     private val secretKey: SecretKey = Keys.hmacShaKeyFor(
         Base64.getDecoder().decode(System.getenv("JWT_SECRET_KEY"))
-            ?: throw IllegalStateException("JWT_SECRET_KEY environment variable not found")
+            ?: throw IllegalStateException("JWT_SECRET_KEY environment variable must be set")
+
 
     )
     private val expirationMs: Long = 1000 * 60 * 60 * 12 // 12 hours
