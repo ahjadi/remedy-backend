@@ -20,9 +20,8 @@ class PrescriberController(
     private val patientService: PatientService,
 ) {
 
-    // TODO make endpoint for each entity just in case. make an endpoint for recurring prescription
+    // TODO Make an endpoint for recurring prescription
     // Create new prescriber user
-    // DB has unique email constraint - need to make a global exception handler to make error more expressive
     @PostMapping("/create")
     fun createNewPrescriber(@RequestBody prescriber: PrescriberRequest): ResponseEntity<Any> {
         return try {
