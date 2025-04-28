@@ -30,7 +30,7 @@ data class PatientBagState(
 data class PatientAndTheirBagSummary(
     // Patient Data
     val name: String,
-    val dob: LocalDate,
+    val dob: String,
     val email: String,
     val phone: String,
 

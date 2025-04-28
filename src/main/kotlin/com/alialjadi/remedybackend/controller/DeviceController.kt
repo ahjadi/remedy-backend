@@ -43,9 +43,9 @@ class DeviceController(private val prescriberService: PrescriberService, private
     }
 
     @PostMapping("/retrieve/patient")
-    fun retrievePatient(@RequestBody patientId: UUID): ResponseEntity<Any> {
+    fun retrievePatient(@RequestBody patientId: PatientIdRequest): ResponseEntity<Any> {
         return try {
-            ResponseEntity.ok().body(patientService.retrievePatient(patientId))
+            ResponseEntity.ok().body(patientService.retrievePatient(patientId.patientId))
         } catch (e: EntityNotFoundException) {
             ResponseEntity.badRequest().body(mapOf("error" to e.message))
         }

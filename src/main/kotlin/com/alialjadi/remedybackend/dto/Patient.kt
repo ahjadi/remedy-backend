@@ -7,7 +7,7 @@ import java.util.UUID
 data class PatientRequest(
     var prescriberId: UUID? = null,
     var name: String,
-    var dob: LocalDate,
+    var dob: String,
     var email: String,
     var phone: String,
     var password: String,
@@ -17,7 +17,7 @@ data class PatientRequest(
 data class PatientSummary(
     val id: UUID?,
     val name: String,
-    val dob: LocalDate,
+    val dob: String,
     val phone: String?
 )
 
@@ -39,4 +39,6 @@ data class PhotoUploadRequest(
     val patientId: UUID,
     val photoPath: String
 )
+
+
 

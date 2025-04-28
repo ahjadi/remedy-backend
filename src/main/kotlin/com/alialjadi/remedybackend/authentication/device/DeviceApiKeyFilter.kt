@@ -12,8 +12,9 @@ import org.springframework.web.filter.OncePerRequestFilter
 
 @Component
 class DeviceApiKeyFilter(
-    // TODO put in env!!!
-    @Value("\${REMEDY_DEVICE_API_KEY}") private val validApiKey: String
+    private val validApiKey: String = System.getenv("REMEDY_DEVICE_API_KEY")
+        ?: throw IllegalStateException("REMEDY_DEVICE_API_KEY environment variable must be set")
+
 ) : OncePerRequestFilter() {
 
     override fun shouldNotFilter(request: HttpServletRequest): Boolean {

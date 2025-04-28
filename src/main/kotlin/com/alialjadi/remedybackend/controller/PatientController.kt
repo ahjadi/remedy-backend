@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import java.time.format.DateTimeParseException
 
 @RestController
 @RequestMapping("/api/patient")
@@ -20,8 +21,10 @@ class PatientController(private val patientService: PatientService) {
     fun createNewPatient(@RequestBody patientRequest: PatientRequest): ResponseEntity<Any> {
         return try {
             ResponseEntity.ok().body(patientService.createPatient(patientRequest))
-        } catch (e: Exception) {
+        } catch (e: DateTimeParseException) {
             ResponseEntity.badRequest().body(e.message)
+        } catch (e: Exception) {
+            ResponseEntity.badRequest().body("Check if Email already in use...Or DoB is in this format dd-MM-yyyy")
         }
     }
 
