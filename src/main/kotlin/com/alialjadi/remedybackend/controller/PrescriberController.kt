@@ -29,7 +29,7 @@ class PrescriberController(
             prescriberService.createPrescriber(prescriber)
             ResponseEntity.ok().body("Prescriber created")
         } catch (e: Exception) {
-            ResponseEntity.badRequest().body("Email already in use or ${e.message}")
+            ResponseEntity.badRequest().body("Email already in use or ${e.message}, email should be in proper format")
         }
     }
 

@@ -24,7 +24,8 @@ class PatientController(private val patientService: PatientService) {
         } catch (e: DateTimeParseException) {
             ResponseEntity.badRequest().body(e.message)
         } catch (e: Exception) {
-            ResponseEntity.badRequest().body("Check if Email already in use...Or DoB is in this format dd-MM-yyyy")
+            ResponseEntity.badRequest()
+                .body("Check if Email already in use and in proper format | DoB format: dd-MM-yyyy")
         }
     }
 

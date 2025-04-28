@@ -3,6 +3,8 @@ package com.alialjadi.remedybackend.entity
 import com.alialjadi.remedybackend.encryption.EncryptedStringConverter
 import com.alialjadi.remedybackend.service.DateTimeValid
 import jakarta.persistence.*
+import jakarta.validation.constraints.Email
+import jakarta.validation.constraints.NotBlank
 import java.util.*
 
 @Entity
@@ -23,6 +25,8 @@ data class PatientEntity(
     var dob: String,
 
     @Convert(converter = EncryptedStringConverter::class)
+    @field:NotBlank(message = "Email must not be blank")
+    @field:Email(message = "Invalid email format")
     var email: String,
 
     @Convert(converter = EncryptedStringConverter::class)
@@ -35,5 +39,5 @@ data class PatientEntity(
 
     val role: String = "PATIENT"
 
-    )
+)
 
