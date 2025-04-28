@@ -21,7 +21,7 @@ class DeviceController(private val prescriberService: PrescriberService, private
 
 
     // Retrieve state
-    @PostMapping("bag/state")
+    @PostMapping("get/bag/state")
     fun getBagState(@RequestBody patientId: PatientIdRequest): ResponseEntity<Any> {
 
         return try {

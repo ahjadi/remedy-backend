@@ -96,7 +96,7 @@ class PrescriberController(
     }
 
     //    set bag state
-    @PostMapping("bag/set/state")
+    @PostMapping("/bag/set/state")
     fun setBagState(@RequestBody newState: SetBagState): ResponseEntity<Any> {
 
         return try {
@@ -117,7 +117,7 @@ class PrescriberController(
     }
 
     // Retrieve state
-    @PostMapping("bag/state")
+    @PostMapping("/bag/state")
     fun getBagState(@RequestBody patientId: PatientIdRequest): ResponseEntity<Any> {
 
         return try {
