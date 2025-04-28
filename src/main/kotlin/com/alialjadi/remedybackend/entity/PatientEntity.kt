@@ -2,16 +2,8 @@ package com.alialjadi.remedybackend.entity
 
 import com.alialjadi.remedybackend.encryption.EncryptedStringConverter
 import com.alialjadi.remedybackend.service.DateTimeValid
-import jakarta.persistence.Convert
-import jakarta.persistence.Entity
-import jakarta.persistence.GeneratedValue
-import jakarta.persistence.GenerationType
-import jakarta.persistence.Id
-import jakarta.persistence.Table
-import org.springframework.format.annotation.DateTimeFormat
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-import java.util.UUID
+import jakarta.persistence.*
+import java.util.*
 
 @Entity
 @Table(name = "patients")

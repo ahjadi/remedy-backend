@@ -1,6 +1,6 @@
 package com.alialjadi.remedybackend.dto
 
-import java.util.UUID
+import java.util.*
 
 data class PrescriberRequest(
     val name: String,

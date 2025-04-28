@@ -1,9 +1,7 @@
 package com.alialjadi.remedybackend.dto
 
-import com.alialjadi.remedybackend.entity.BagEntity
 import com.alialjadi.remedybackend.entity.BagState
-import java.time.LocalDate
-import java.util.UUID
+import java.util.*
 
 data class BagCreation(
     val patientId: UUID,

@@ -1,8 +1,7 @@
 package com.alialjadi.remedybackend.dto
 
-import org.jetbrains.annotations.NotNull
-import java.time.LocalDate
-import java.util.UUID
+
+import java.util.*
 
 data class PatientRequest(
     var prescriberId: UUID? = null,

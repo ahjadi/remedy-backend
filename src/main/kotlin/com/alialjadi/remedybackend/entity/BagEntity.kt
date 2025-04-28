@@ -1,19 +1,9 @@
 package com.alialjadi.remedybackend.entity
 
 import com.alialjadi.remedybackend.encryption.EncryptedStringConverter
-import jakarta.persistence.AttributeConverter
-import jakarta.persistence.Column
-import jakarta.persistence.Convert
-import jakarta.persistence.Converter
-import jakarta.persistence.Entity
-import jakarta.persistence.EnumType
-import jakarta.persistence.Enumerated
-import jakarta.persistence.GeneratedValue
-import jakarta.persistence.GenerationType
-import jakarta.persistence.Id
-import jakarta.persistence.Table
+import jakarta.persistence.*
 import java.time.Instant
-import java.util.UUID
+import java.util.*
 
 @Entity
 @Table(name = "bags")
