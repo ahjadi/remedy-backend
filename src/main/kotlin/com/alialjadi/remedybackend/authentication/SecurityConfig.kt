@@ -24,17 +24,23 @@ class SecurityConfig(
     private val userDetailsService: UserDetailsService,
     private val deviceApiKeyFilter: DeviceApiKeyFilter
 ) {
-    // For authorization you need to add code in security config, customuserdetails, and jwtservice
+    // For authorization, you need to add code in security config, customuserdetails, and jwtservice
     @Bean
     fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
         http.csrf { it.disable() }
+            // For HTTPS
+            .requiresChannel { channel ->
+                channel.anyRequest().requiresSecure()
+            }
+
             .authorizeHttpRequests {
                 it
 //                    .anyRequest().permitAll()  // permit all
 
                     .requestMatchers(
                         "/auth/login",
-                        "/api/prescriber/create", "/api/patient/create"
+                        "/api/prescriber/create", "/api/patient/create",
+                        "api-docs"
                     ).permitAll()
                     // Device endpoints - require ROLE_DEVICE
                     .requestMatchers("/api/device/**").hasRole("DEVICE")

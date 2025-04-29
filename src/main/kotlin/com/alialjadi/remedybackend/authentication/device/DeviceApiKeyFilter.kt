@@ -3,6 +3,7 @@ package com.alialjadi.remedybackend.authentication.device
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken
@@ -11,8 +12,8 @@ import org.springframework.web.filter.OncePerRequestFilter
 
 @Component
 class DeviceApiKeyFilter(
-    private val validApiKey: String = System.getenv("REMEDY_DEVICE_API_KEY")
-        ?: throw IllegalStateException("REMEDY_DEVICE_API_KEY environment variable must be set")
+    @Value("\${REMEDY_DEVICE_API_KEY}")
+    private val validApiKey: String
 
 ) : OncePerRequestFilter() {
 
