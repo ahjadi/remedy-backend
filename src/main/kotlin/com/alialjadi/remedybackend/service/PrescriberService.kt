@@ -137,7 +137,7 @@ class PrescriberService(
         return PatientBagState(bag.state)
     }
 
-    // for prescriber TODO
+    // for prescriber
     fun assignPatientToPrescriber(prescriberToPatient: AssignPrescriber) {
 
         val prescriber = prescriberRepository.findById(prescriberToPatient.prescriberId)

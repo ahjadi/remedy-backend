@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.alialjadi</groupId>
     <artifactId>remedy-backend</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>1.0.0</version>
     <name>remedy-backend</name>
     <description>remedy-backend</description>
     <url/>
@@ -123,6 +123,12 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.webjars/swagger-ui -->
+        <dependency>
+            <groupId>org.webjars</groupId>
+            <artifactId>swagger-ui</artifactId>
+            <version>5.21.0</version>
         </dependency>
 
     </dependencies>
