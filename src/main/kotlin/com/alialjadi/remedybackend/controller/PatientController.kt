@@ -1,5 +1,6 @@
 package com.alialjadi.remedybackend.controller
 
+import com.alialjadi.remedybackend.authentication.UserPrincipal
 import com.alialjadi.remedybackend.dto.PatientIdRequest
 import com.alialjadi.remedybackend.dto.PatientRequest
 import com.alialjadi.remedybackend.dto.PhotoUploadRequest
@@ -10,6 +11,7 @@ import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.persistence.EntityNotFoundException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -45,8 +47,14 @@ class PatientController(
         description = "Stores the path of a patient's photo in the system"
     )
     @PostMapping("/upload/photo/path")
-    fun uploadPhotoPath(@RequestBody request: PhotoUploadRequest): ResponseEntity<Any> {
+    fun uploadPhotoPath(
+        @AuthenticationPrincipal patient: UserPrincipal,
+        @RequestBody request: PhotoUploadRequest
+    ): ResponseEntity<Any> {
         return try {
+            if (patient.getPatientId() != request.patientId) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Patient Id does not match request.")
+            }
             ResponseEntity.ok().body(patientService.uploadPhoto(request))
         } catch (e: EntityNotFoundException) {
             ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -59,8 +67,14 @@ class PatientController(
         description = "Returns full patient details using patient ID"
     )
     @PostMapping("/retrieve/patient")
-    fun retrievePatient(@RequestBody patientId: PatientIdRequest): ResponseEntity<Any> {
+    fun retrievePatient(
+        @AuthenticationPrincipal patient: UserPrincipal,
+        @RequestBody patientId: PatientIdRequest
+    ): ResponseEntity<Any> {
         return try {
+            if (patient.getPatientId() != patientId.patientId) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Patient Id does not match request.")
+            }
             ResponseEntity.ok().body(patientService.retrievePatient(patientId.patientId))
         } catch (e: EntityNotFoundException) {
             ResponseEntity.badRequest().body(mapOf("error" to e.message))
@@ -74,8 +88,14 @@ class PatientController(
         description = "Fetches both the patient's details and their associated medication bag"
     )
     @PostMapping("/patient/bag/view")
-    fun viewPatientAndBag(@RequestBody patientId: PatientIdRequest): ResponseEntity<Any> {
+    fun viewPatientAndBag(
+        @AuthenticationPrincipal patient: UserPrincipal,
+        @RequestBody patientId: PatientIdRequest
+    ): ResponseEntity<Any> {
         return try {
+            if (patient.getPatientId() != patientId.patientId) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Patient Id does not match request.")
+            }
             ResponseEntity.ok().body(prescriberService.viewBag(patientId))
         } catch (e: EntityNotFoundException) {
             ResponseEntity.status(HttpStatus.NOT_FOUND).body(mapOf("error" to e.message))
