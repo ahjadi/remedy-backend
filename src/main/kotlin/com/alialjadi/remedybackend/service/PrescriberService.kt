@@ -22,6 +22,7 @@ class PrescriberService(
     private val historyService: MedicationHistoryService
 ) {
 
+
     // Retrieve all bags assigned to a prescriber == A list of bags
     fun retrieveAllBags(prescriberId: UUID?): List<BagEntity> {
 

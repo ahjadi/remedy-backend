@@ -79,3 +79,9 @@ ALTER TABLE medication_history
     ALTER COLUMN action TYPE VARCHAR(20);
 -- drop the existing enum type
 DROP TYPE history_action;
+
+
+ALTER TABLE bags
+    DROP CONSTRAINT bags_patient_id_fkey,
+    ADD CONSTRAINT bags_patient_id_fkey
+        FOREIGN KEY (patient_id) REFERENCES patients(id) ON DELETE CASCADE;
