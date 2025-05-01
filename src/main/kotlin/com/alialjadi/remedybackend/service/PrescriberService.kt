@@ -74,14 +74,10 @@ class PrescriberService(
 
         val existingBag = bagRepository.findByPatientId(bag.patientId)
 
-        val bagToSave = if (existingBag == null)
-                            BagEntity(patientId = bag.patientId, prescription = bag.prescription)
-                        else
-                            existingBag.copy(prescription = bag.prescription)
+        val bagToSave = existingBag?.copy(prescription = bag.prescription)
+            ?: BagEntity(patientId = bag.patientId, prescription = bag.prescription)
 
         bagRepository.save(bagToSave)
-
-
     }
 
     // for prescriber: updates the prescription only no effect on its state
