@@ -66,17 +66,22 @@ class PrescriberService(
         }
     }
 
-    // for prescriber: creates a new bag for a patient
+    // for prescriber: creates or update a new bag for a patient
     fun createBag(bag: BagCreation) {
 
         patientRepository.findById(bag.patientId)
             .orElseThrow { EntityNotFoundException("No patient found for id ${bag.patientId}") }
 
-        val newBagEntity = BagEntity(
-            patientId = bag.patientId,
-            prescription = bag.prescription,
-        )
-        bagRepository.save(newBagEntity)
+        val existingBag = bagRepository.findByPatientId(bag.patientId)
+
+        val bagToSave = if (existingBag == null)
+                            BagEntity(patientId = bag.patientId, prescription = bag.prescription)
+                        else
+                            existingBag.copy(prescription = bag.prescription)
+
+        bagRepository.save(bagToSave)
+
+
     }
 
     // for prescriber: updates the prescription only no effect on its state
