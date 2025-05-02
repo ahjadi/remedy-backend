@@ -51,6 +51,7 @@ class PrescriberService(
         prescriberRepository.save(newPrescriberEntity)
     }
 
+
     // for prescriber
     fun viewPatients(prescriberId: UUID): List<PatientSummary> {
 
