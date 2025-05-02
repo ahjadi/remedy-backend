@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
+import java.util.UUID
 
 @RestController
 @RequestMapping("/api/prescriber")
@@ -24,6 +25,16 @@ class PrescriberController(
     private val historyService: MedicationHistoryService,
     private val patientService: PatientService,
 ) {
+
+    @Operation(summary = "Delete a patient by ID", description = "Deletes a patient if the patient ID exists.")
+    @DeleteMapping("/remove/{patientId}")
+    fun removePatient(@PathVariable("patientId") patientId: UUID): ResponseEntity<Any> {
+        return try {
+            ResponseEntity.ok().body( prescriberService.deletePatient(patientId))
+        } catch (e: EntityNotFoundException){
+            ResponseEntity.internalServerError().body(e.message)
+        }
+    }
 
     @Operation(summary = "Returns a list of unassigned patients.")
     @GetMapping("/unassigned/patients")

@@ -9,6 +9,7 @@ import com.alialjadi.remedybackend.repository.PatientRepository
 import com.alialjadi.remedybackend.repository.PrescriberRepository
 import jakarta.persistence.EntityNotFoundException
 import jakarta.transaction.Transactional
+import org.springframework.http.ResponseEntity
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import java.util.*
@@ -23,167 +24,174 @@ class PrescriberService(
     private val historyService: MedicationHistoryService
 ) {
 
-
-    // Retrieve all bags assigned to a prescriber == A list of bags
-    fun retrieveAllBags(prescriberId: UUID?): List<BagEntity> {
-
-        val patientIds = patientRepository.findAllByPrescriberId(prescriberId!!).map { it!!.id }
-        val bags = bagRepository.findAllByPatientIdIn(patientIds)
-
-        return bags
+    fun deletePatient(patientId: UUID): String {
+        if(!patientRepository.existsById(patientId)){
+            throw EntityNotFoundException("Patient with id $patientId not found")
+        }
+        patientRepository.deleteById(patientId)
+        return "Patient deleted successfully"
     }
 
-    // Retrieve all unsealed bags assigned to a prescriber == A list of bags
-    fun retrieveAllUnsealedBags(prescriberId: UUID?): List<BagEntity> {
+        // Retrieve all bags assigned to a prescriber == A list of bags
+        fun retrieveAllBags(prescriberId: UUID?): List<BagEntity> {
 
-        val patientIds = patientRepository.findAllByPrescriberId(prescriberId!!).map { it!!.id }
-        val unsealedBags = bagRepository.findAllByPatientIdIn(patientIds).filter { it.state == BagState.UNSEALED }
-        return unsealedBags
-    }
+            val patientIds = patientRepository.findAllByPrescriberId(prescriberId!!).map { it!!.id }
+            val bags = bagRepository.findAllByPatientIdIn(patientIds)
 
-    // for prescriber
-    fun createPrescriber(prescriber: PrescriberRequest) {
+            return bags
+        }
 
-        val newPrescriberEntity = PrescriberEntity(
-            name = prescriber.name,
-            email = prescriber.email,
-            password = passwordEncoder.encode(prescriber.password),
-        )
-        prescriberRepository.save(newPrescriberEntity)
-    }
+        // Retrieve all unsealed bags assigned to a prescriber == A list of bags
+        fun retrieveAllUnsealedBags(prescriberId: UUID?): List<BagEntity> {
 
+            val patientIds = patientRepository.findAllByPrescriberId(prescriberId!!).map { it!!.id }
+            val unsealedBags = bagRepository.findAllByPatientIdIn(patientIds).filter { it.state == BagState.UNSEALED }
+            return unsealedBags
+        }
 
-    // for prescriber
-    fun viewPatients(prescriberId: UUID): List<PatientSummary> {
+        // for prescriber
+        fun createPrescriber(prescriber: PrescriberRequest) {
 
-        prescriberRepository.findById(prescriberId)
-            .orElseThrow { EntityNotFoundException("No Prescriber found with id $prescriberId") }
-
-        return patientRepository.findAllByPrescriberId(prescriberId).map { patientEntity ->
-            PatientSummary(
-                id = patientEntity!!.id,
-                name = patientEntity.name,
-                dob = patientEntity.dob,
-                phone = patientEntity.phone
+            val newPrescriberEntity = PrescriberEntity(
+                name = prescriber.name,
+                email = prescriber.email,
+                password = passwordEncoder.encode(prescriber.password),
             )
-        }
-    }
-
-    // for prescriber: creates or update a new bag for a patient
-    fun createBag(bag: BagCreation) {
-
-        patientRepository.findById(bag.patientId)
-            .orElseThrow { EntityNotFoundException("No patient found for id ${bag.patientId}") }
-
-        val existingBag = bagRepository.findByPatientId(bag.patientId)
-
-        val bagToSave = existingBag?.copy(prescription = bag.prescription)
-            ?: BagEntity(patientId = bag.patientId, prescription = bag.prescription)
-
-        bagRepository.save(bagToSave)
-    }
-
-    // for prescriber: updates the prescription only no effect on its state
-    fun updatePrescription(newPrescription: UpdatePrescription) {
-
-        val bag = bagRepository.findByPatientId(newPrescription.patientId)
-            ?: throw EntityNotFoundException("No bag found for patient id ${newPrescription.patientId}")
-
-        bag.prescription = newPrescription.prescription
-
-        bagRepository.save(bag)
-    }
-
-    // for prescriber and device: updates the state of the bag
-    @Transactional
-    fun setBagState(newBageState: SetBagState) {
-
-        val bag = bagRepository.findByPatientId(newBageState.patientId)
-            ?: throw EntityNotFoundException("No bag found for patient id ${newBageState.patientId}")
-
-        val originalState = bag.state
-        bag.state = newBageState.bagState
-
-        val updatedBag = bagRepository.save(bag)
-
-        if (originalState != newBageState.bagState) {
-            historyService.recordStateChange(updatedBag, newBageState.bagState, newBageState.prescriberId)
+            prescriberRepository.save(newPrescriberEntity)
         }
 
-    }
+
+        // for prescriber
+        fun viewPatients(prescriberId: UUID): List<PatientSummary> {
+
+            prescriberRepository.findById(prescriberId)
+                .orElseThrow { EntityNotFoundException("No Prescriber found with id $prescriberId") }
+
+            return patientRepository.findAllByPrescriberId(prescriberId).map { patientEntity ->
+                PatientSummary(
+                    id = patientEntity!!.id,
+                    name = patientEntity.name,
+                    dob = patientEntity.dob,
+                    phone = patientEntity.phone
+                )
+            }
+        }
+
+        // for prescriber: creates or update a new bag for a patient
+        fun createBag(bag: BagCreation) {
+
+            patientRepository.findById(bag.patientId)
+                .orElseThrow { EntityNotFoundException("No patient found for id ${bag.patientId}") }
+
+            val existingBag = bagRepository.findByPatientId(bag.patientId)
+
+            val bagToSave = existingBag?.copy(prescription = bag.prescription)
+                ?: BagEntity(patientId = bag.patientId, prescription = bag.prescription)
+
+            bagRepository.save(bagToSave)
+        }
+
+        // for prescriber: updates the prescription only no effect on its state
+        fun updatePrescription(newPrescription: UpdatePrescription) {
+
+            val bag = bagRepository.findByPatientId(newPrescription.patientId)
+                ?: throw EntityNotFoundException("No bag found for patient id ${newPrescription.patientId}")
+
+            bag.prescription = newPrescription.prescription
+
+            bagRepository.save(bag)
+        }
+
+        // for prescriber and device: updates the state of the bag
+        @Transactional
+        fun setBagState(newBageState: SetBagState) {
+
+            val bag = bagRepository.findByPatientId(newBageState.patientId)
+                ?: throw EntityNotFoundException("No bag found for patient id ${newBageState.patientId}")
+
+            val originalState = bag.state
+            bag.state = newBageState.bagState
+
+            val updatedBag = bagRepository.save(bag)
+
+            if (originalState != newBageState.bagState) {
+                historyService.recordStateChange(updatedBag, newBageState.bagState, newBageState.prescriberId)
+            }
+
+        }
 
 
-    // for prescriber: returns info of patient and their bag
-    fun viewBag(patientId: PatientIdRequest): PatientAndTheirBagSummary {
+        // for prescriber: returns info of patient and their bag
+        fun viewBag(patientId: PatientIdRequest): PatientAndTheirBagSummary {
 
-        val patient = patientRepository.findById(patientId.patientId)
-            .orElseThrow { EntityNotFoundException("No patient found for id $patientId") }
+            val patient = patientRepository.findById(patientId.patientId)
+                .orElseThrow { EntityNotFoundException("No patient found for id $patientId") }
 
-        val bag = bagRepository.findByPatientId(patientId.patientId)
-            ?: throw EntityNotFoundException("No bag found for patient id $patientId")
+            val bag = bagRepository.findByPatientId(patientId.patientId)
+                ?: throw EntityNotFoundException("No bag found for patient id $patientId")
 
-        return PatientAndTheirBagSummary(
-            name = patient.name,
-            dob = patient.dob,
-            email = patient.email,
-            phone = patient.phone,
+            return PatientAndTheirBagSummary(
+                name = patient.name,
+                dob = patient.dob,
+                email = patient.email,
+                phone = patient.phone,
 
-            prescription = bag.prescription,
-            bagState = bag.state
-        )
-
-    }
-
-    // for prescriber and device: retrieve BAG STATE
-    fun getState(patientId: PatientIdRequest): PatientBagState {
-        val bag = bagRepository.findByPatientId(patientId.patientId)
-            ?: throw EntityNotFoundException("No bag found for patientId $patientId")
-        return PatientBagState(bag.state)
-    }
-
-    // retrieve all unassigned patients
-    fun retrieveUnassignedPatients(): List<Any> {
-        val unassignedPatients = patientRepository.findAll().filter { it.prescriberId == null }
-            .map { patientEntity ->
-            PatientVerbose(
-                patientId = patientEntity.id!!,
-                prescriberId = null,
-                patientName = patientEntity.name,
-                patientEmail = patientEntity.email,
-                patientPhone = patientEntity.phone,
-                patientFaceImagePath = patientEntity.faceImagePath,
+                prescription = bag.prescription,
+                bagState = bag.state
             )
+
         }
-        return unassignedPatients.ifEmpty {
-            listOf("No unassigned patients")
+
+        // for prescriber and device: retrieve BAG STATE
+        fun getState(patientId: PatientIdRequest): PatientBagState {
+            val bag = bagRepository.findByPatientId(patientId.patientId)
+                ?: throw EntityNotFoundException("No bag found for patientId $patientId")
+            return PatientBagState(bag.state)
         }
+
+        // retrieve all unassigned patients
+        fun retrieveUnassignedPatients(): List<Any> {
+            val unassignedPatients = patientRepository.findAll().filter { it.prescriberId == null }
+                .map { patientEntity ->
+                    PatientVerbose(
+                        patientId = patientEntity.id!!,
+                        prescriberId = null,
+                        patientName = patientEntity.name,
+                        patientEmail = patientEntity.email,
+                        patientPhone = patientEntity.phone,
+                        patientFaceImagePath = patientEntity.faceImagePath,
+                    )
+                }
+            return unassignedPatients.ifEmpty {
+                listOf("No unassigned patients")
+            }
+        }
+
+
+        // for prescriber
+        fun assignPatientToPrescriber(prescriberToPatient: AssignPrescriber) {
+
+            val prescriber = prescriberRepository.findById(prescriberToPatient.prescriberId)
+                .orElseThrow { EntityNotFoundException("No prescriber found for ${prescriberToPatient.prescriberId}") }
+            val patient = patientRepository.findById(prescriberToPatient.patientId)
+                .orElseThrow { EntityNotFoundException("No patient found for ${prescriberToPatient.patientId}") }
+
+            patient.prescriberId = prescriberToPatient.prescriberId
+            patientRepository.save(patient)
+        }
+
+        fun retrievePrescriber(prescriberId: UUID): PrescriberVerbose? {
+            val prescriber = prescriberRepository.findById(prescriberId)
+                .orElseThrow { EntityNotFoundException("No Prescriber found for id $prescriberId") }
+
+            val prescriberData = PrescriberVerbose(
+                prescriberId = prescriber.id!!,
+                prescriberName = prescriber.name,
+                prescriberEmail = prescriber.email,
+            )
+
+            return prescriberData
+        }
+
+
     }
-
-
-    // for prescriber
-    fun assignPatientToPrescriber(prescriberToPatient: AssignPrescriber) {
-
-        val prescriber = prescriberRepository.findById(prescriberToPatient.prescriberId)
-            .orElseThrow { EntityNotFoundException("No prescriber found for ${prescriberToPatient.prescriberId}") }
-        val patient = patientRepository.findById(prescriberToPatient.patientId)
-            .orElseThrow { EntityNotFoundException("No patient found for ${prescriberToPatient.patientId}") }
-
-        patient.prescriberId = prescriberToPatient.prescriberId
-        patientRepository.save(patient)
-    }
-
-    fun retrievePrescriber(prescriberId: UUID): PrescriberVerbose? {
-        val prescriber = prescriberRepository.findById(prescriberId)
-            .orElseThrow { EntityNotFoundException("No Prescriber found for id $prescriberId") }
-
-        val prescriberData = PrescriberVerbose(
-            prescriberId = prescriber.id!!,
-            prescriberName = prescriber.name,
-            prescriberEmail = prescriber.email,
-        )
-
-        return prescriberData
-    }
-
-
-}
