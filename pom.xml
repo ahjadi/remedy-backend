@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.alialjadi</groupId>
     <artifactId>remedy-backend</artifactId>
-    <version>1.0.2</version>
+    <version>1.0.3</version>
     <name>remedy-backend</name>
     <description>remedy-backend</description>
     <url/>
