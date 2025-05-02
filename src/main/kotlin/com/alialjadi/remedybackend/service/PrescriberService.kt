@@ -13,6 +13,7 @@ import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import java.util.*
 
+
 @Service
 class PrescriberService(
     private val prescriberRepository: PrescriberRepository,
@@ -139,6 +140,25 @@ class PrescriberService(
             ?: throw EntityNotFoundException("No bag found for patientId $patientId")
         return PatientBagState(bag.state)
     }
+
+    // retrieve all unassigned patients
+    fun retrieveUnassignedPatients(): List<Any> {
+        val unassignedPatients = patientRepository.findAll().filter { it.prescriberId == null }
+            .map { patientEntity ->
+            PatientVerbose(
+                patientId = patientEntity.id!!,
+                prescriberId = null,
+                patientName = patientEntity.name,
+                patientEmail = patientEntity.email,
+                patientPhone = patientEntity.phone,
+                patientFaceImagePath = patientEntity.faceImagePath,
+            )
+        }
+        return unassignedPatients.ifEmpty {
+            listOf("No unassigned patients")
+        }
+    }
+
 
     // for prescriber
     fun assignPatientToPrescriber(prescriberToPatient: AssignPrescriber) {

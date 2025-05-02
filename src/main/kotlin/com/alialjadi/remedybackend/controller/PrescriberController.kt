@@ -25,6 +25,14 @@ class PrescriberController(
     private val patientService: PatientService,
 ) {
 
+    @Operation(summary = "Returns a list of unassigned patients.")
+    @GetMapping("/unassigned/patients")
+    fun retrieveAllUnassignedPatients(): ResponseEntity<Any> {
+        val unassignedPatients = prescriberService.retrieveUnassignedPatients()
+
+        return ResponseEntity.ok().body(prescriberService.retrieveUnassignedPatients())
+    }
+
     // Create new prescriber user
     @Operation(summary = "Create a new prescriber", description = "Registers a new prescriber using their details")
     @PostMapping("/create")
@@ -66,11 +74,13 @@ class PrescriberController(
         description = "Retrieves bags in LOADED state only for a prescriber's patients"
     )
     @GetMapping("/patient/loaded/bags")
-    fun retrieveUnsealedBags(@AuthenticationPrincipal principalId: UserPrincipal): List<BagEntity> {
+    fun retrieveLoadedBags(@AuthenticationPrincipal principalId: UserPrincipal): List<BagEntity> {
         // This is not optimal I should filter at the DB level later
         return prescriberService.retrieveAllBags(principalId.getPrescriberId())
             .filter { it.state == BagState.LOADED }
     }
+
+
 
 
     @Operation(
