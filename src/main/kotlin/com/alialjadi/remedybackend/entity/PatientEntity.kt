@@ -24,6 +24,7 @@ data class PatientEntity(
     @field:DateTimeValid(format = "dd-MM-yyyy", message = "dd-MM-yyyy")
     var dob: String,
 
+
     @field:NotBlank(message = "Email must not be blank")
     @field:Email(message = "Invalid email format")
     var email: String,

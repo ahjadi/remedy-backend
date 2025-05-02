@@ -1,5 +1,6 @@
 package com.alialjadi.remedybackend.authentication.jwt
 
+import com.alialjadi.remedybackend.encryption.EncryptionService
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.security.Keys
@@ -10,7 +11,8 @@ import javax.crypto.SecretKey
 
 
 @Component
-class JwtService(@Value("\${JWT_SECRET_KEY}") secretKeyBase64: String) {
+class JwtService(
+    @Value("\${JWT_SECRET_KEY}") secretKeyBase64: String) {
 
     private val secretKey: SecretKey = Keys.hmacShaKeyFor(
         Base64.getDecoder().decode(secretKeyBase64)
