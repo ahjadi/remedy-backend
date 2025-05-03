@@ -1,5 +1,6 @@
 package com.alialjadi.remedybackend.service
 
+import com.alialjadi.remedybackend.dto.PatientIdRequest
 import com.alialjadi.remedybackend.dto.PatientRequest
 import com.alialjadi.remedybackend.dto.PatientVerbose
 import com.alialjadi.remedybackend.dto.PhotoUploadRequest
@@ -17,7 +18,7 @@ class PatientService(
 ) {
 
     // create new patient user
-    fun createPatient(patientRequest: PatientRequest) {
+    fun createPatient(patientRequest: PatientRequest): PatientIdRequest {
         val newPatientEntity = PatientEntity(
             prescriberId = patientRequest.prescriberId,
             name = patientRequest.name,
@@ -28,6 +29,8 @@ class PatientService(
             faceImagePath = patientRequest.faceImagePath,
         )
         patientRepository.save(newPatientEntity)
+        val patientId : UUID? = newPatientEntity.id
+        return PatientIdRequest(patientId!!)
     }
 
     fun retrievePatient(patientId: UUID): PatientVerbose {
