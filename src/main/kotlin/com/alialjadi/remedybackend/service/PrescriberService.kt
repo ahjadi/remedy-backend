@@ -24,6 +24,22 @@ class PrescriberService(
     private val historyService: MedicationHistoryService
 ) {
 
+    fun validateFullName(fullName: String) {
+        val trimmed = fullName.trim()
+        require(trimmed.isNotBlank()) { "Name cannot be blank" }
+        require(trimmed.length >= 3) { "Name should be more than 2 characters" }
+        require(!trimmed.any { it.isDigit() }) { "Name should not contain any digits" }
+        require(trimmed.matches(Regex("^[a-zA-Z\\s'-]+$"))) {
+            "Name can only contain letters, spaces, hyphens, and apostrophes"
+        }
+    }
+
+    fun validatePassword(password: String) {
+        require(password.length >= 8) { "Password must be at least 8 characters long" }
+        require(password.any { it.isUpperCase() }) { "Password must contain at least one uppercase letter" }
+        require(password.any { it.isDigit() }) { "Password must contain at least one number" }
+    }
+
     fun deletePatient(patientId: UUID): String {
         if(!patientRepository.existsById(patientId)){
             throw EntityNotFoundException("Patient with id $patientId not found")
@@ -51,6 +67,8 @@ class PrescriberService(
 
         // for prescriber
         fun createPrescriber(prescriber: PrescriberRequest) {
+            validateFullName(prescriber.name)
+            validatePassword(prescriber.password)
 
             val newPrescriberEntity = PrescriberEntity(
                 name = prescriber.name,
