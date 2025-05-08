@@ -85,3 +85,6 @@ ALTER TABLE bags
     DROP CONSTRAINT bags_patient_id_fkey,
     ADD CONSTRAINT bags_patient_id_fkey
         FOREIGN KEY (patient_id) REFERENCES patients(id) ON DELETE CASCADE;
+
+alter table prescribers
+    add phone text;

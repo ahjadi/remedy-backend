@@ -66,6 +66,16 @@ class PrescriberController(
         return prescriberService.retrieveAllBags(principalId.getPrescriberId())
     }
 
+    @Operation(
+        summary = "Get all bags for prescriber's patients",
+        description = "Returns List<PatientsAndTheirBagsVerbose>"
+    )
+    @GetMapping("/patient/v2/bags")
+    fun retrieveAllV2Bags(@AuthenticationPrincipal principal: UserPrincipal): ResponseEntity<List<PatientsAndTheirBagsVerbose>?> {
+        return ResponseEntity.ok()
+            .body(prescriberService.retrieveAllPatientsAndBags(principal.getPrescriberId()!!))
+    }
+
 
     @Operation(
         summary = "Get LOADED bags only",
@@ -76,6 +86,16 @@ class PrescriberController(
         // This is not optimal I should filter at the DB level later
         return prescriberService.retrieveAllBags(principalId.getPrescriberId())
             .filter { it.state == BagState.LOADED }
+    }
+
+    @Operation(
+        summary = "Get Loaded bags only for prescriber's patients",
+        description = "Returns List<PatientsAndTheirBagsVerbose>"
+    )
+    @GetMapping("/patient/v2/loaded/bags")
+    fun retrieveLoadedBagsV2(@AuthenticationPrincipal principal: UserPrincipal): List<PatientsAndTheirBagsVerbose> {
+        return prescriberService.retrieveAllPatientsAndBags(principal.getPrescriberId()!!)
+            .filter { (patient, bag) -> bag.state == BagState.LOADED }
     }
 
 
@@ -89,6 +109,15 @@ class PrescriberController(
         return prescriberService.retrieveAllUnsealedBags(principalId.getPrescriberId())
     }
 
+
+    @Operation(
+        summary = "Get UNSEALED bags only",
+        description = "returns List<PatientsAndTheirBagsVerbose> in UNSEALED state only for a prescriber's patients"
+    )
+    @GetMapping("/patient/v2/unsealed/bags")
+        fun retrieveAllUnsealedBagsV2(@AuthenticationPrincipal principal: UserPrincipal): List<PatientsAndTheirBagsVerbose> {
+            return prescriberService.retrieveAllUnsealedBagsV2(principal.getPrescriberId()!!)
+        }
 
     // views all patients of a prescriber
     @Operation(

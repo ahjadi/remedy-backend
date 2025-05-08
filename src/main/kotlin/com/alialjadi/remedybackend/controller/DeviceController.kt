@@ -2,12 +2,15 @@ package com.alialjadi.remedybackend.controller
 
 import com.alialjadi.remedybackend.dto.PatientIdRequest
 import com.alialjadi.remedybackend.dto.PrescriberIdRequest
+import com.alialjadi.remedybackend.dto.PullNotification
 import com.alialjadi.remedybackend.dto.SetBagState
+import com.alialjadi.remedybackend.service.NotificationService
 import com.alialjadi.remedybackend.service.PatientService
 import com.alialjadi.remedybackend.service.PrescriberService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -15,11 +18,31 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("/api/device")
-@Tag(name = "Device API")
-class DeviceController(private val prescriberService: PrescriberService, private val patientService: PatientService) {
+@Tag(name = "Device/Pull-Notification API")
+class DeviceController(
+    private val prescriberService: PrescriberService,
+    private val patientService: PatientService,
+    private val notificationService: NotificationService
+) {
 
 
-    // retrieve
+    @Operation(
+        summary = "Get all pull notifications",
+        description = """
+        Returns a list of all patients with their associated bag and prescriber info, if available.
+
+        If any field is null:
+        - Bag-related fields (bagId, bagPrescription, bagState) being null means the patient has no bag.
+        - Prescriber-related fields (prescriberId, prescriberName, etc.) being null means the patient is not yet assigned to a prescriber.
+    """
+    )
+    @GetMapping("/pull")
+    fun retrieveAllPullNotifications(): ResponseEntity<List<PullNotification>> {
+        val notifications = notificationService.getPullNotifications()
+        return ResponseEntity.ok(notifications)
+    }
+
+
 
     // Retrieve state
     @Operation(

@@ -65,6 +65,33 @@ class PrescriberService(
             return unsealedBags
         }
 
+    fun retrieveAllUnsealedBagsV2(prescriberId: UUID?): List<PatientsAndTheirBagsVerbose> {
+        val patients = patientRepository.findAllByPrescriberId(prescriberId!!)
+        val patientMap = patients.associateBy { it?.id }
+
+        val unsealedBags = bagRepository
+            .findAllByPatientIdIn(patientMap.keys.toList())
+            .filter { it.state == BagState.UNSEALED }
+
+        return unsealedBags.mapNotNull { bag ->
+            val patient = patientMap[bag.patientId]
+            if (patient != null) PatientsAndTheirBagsVerbose(patient, bag) else null
+        }
+    }
+
+    fun retrieveAllPatientsAndBags(prescriberId: UUID): List<PatientsAndTheirBagsVerbose> {
+        val patients = patientRepository.findAllByPrescriberId(prescriberId)
+        val patientMap = patients.associateBy { it?.id }
+
+        val bags = bagRepository.findAllByPatientIdIn(patientMap.keys.toList())
+
+        return bags.mapNotNull { bag ->
+            val patient = patientMap[bag.patientId]
+            if (patient != null) PatientsAndTheirBagsVerbose(patient, bag) else null
+        }
+    }
+
+
         // for prescriber
         fun createPrescriber(prescriber: PrescriberRequest) {
             validateFullName(prescriber.name)
@@ -74,9 +101,12 @@ class PrescriberService(
                 name = prescriber.name,
                 email = prescriber.email,
                 password = passwordEncoder.encode(prescriber.password),
+                phone = prescriber.phone,
             )
             prescriberRepository.save(newPrescriberEntity)
         }
+
+
 
 
         // for prescriber
@@ -210,6 +240,9 @@ class PrescriberService(
 
             return prescriberData
         }
+
+
+
 
 
     }

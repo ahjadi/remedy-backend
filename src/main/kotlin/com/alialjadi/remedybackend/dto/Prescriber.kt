@@ -6,6 +6,7 @@ data class PrescriberRequest(
     val name: String,
     val email: String,
     val password: String,
+    val phone: String,
 )
 data class AssignPrescriber(
     val patientId: UUID,

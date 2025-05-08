@@ -10,4 +10,5 @@ interface BagRepository : JpaRepository<BagEntity, UUID> {
 
     fun findByPatientId(patientId: UUID): BagEntity?
     fun findAllByPatientIdIn(patientIds: List<UUID?>): List<BagEntity>
+    fun findTopByPatientIdOrderByCreatedAtDesc(patientId: UUID?): BagEntity?
 }

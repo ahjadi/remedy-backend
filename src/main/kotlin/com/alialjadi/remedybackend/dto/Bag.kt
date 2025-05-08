@@ -1,6 +1,8 @@
 package com.alialjadi.remedybackend.dto
 
+import com.alialjadi.remedybackend.entity.BagEntity
 import com.alialjadi.remedybackend.entity.BagState
+import com.alialjadi.remedybackend.entity.PatientEntity
 import java.util.*
 
 data class BagCreation(
@@ -35,4 +37,12 @@ data class PatientAndTheirBagSummary(
     // Bag Data
     val prescription: String,
     val bagState: BagState,
+)
+
+data class PatientsAndTheirBagsVerbose(
+    // Patient Data
+    val patient: PatientEntity,
+    // Bag Data
+    val bag: BagEntity
+
 )
