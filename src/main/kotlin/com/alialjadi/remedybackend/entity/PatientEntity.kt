@@ -5,6 +5,7 @@ import com.alialjadi.remedybackend.service.DateTimeValid
 import jakarta.persistence.*
 import jakarta.validation.constraints.Email
 import jakarta.validation.constraints.NotBlank
+import jakarta.validation.constraints.Pattern
 import java.util.*
 
 @Entity
@@ -30,6 +31,10 @@ data class PatientEntity(
     var email: String,
 
     @Convert(converter = EncryptedStringConverter::class)
+    @field:Pattern(
+        regexp = "^[9654]\\d{7}$",
+        message = "Enter a valid Kuwaiti phone number"
+    )
     var phone: String,
 
     var password: String,

@@ -30,8 +30,8 @@ class AuthenticationController(
 
             // Ensure userDetails is of type UserPrincipal
             if (userDetails is UserPrincipal) {
-                val id = userDetails.getId()  // Get the user's ID from UserPrincipal
-                val email = userDetails.username  // Get the user's email from UserPrincipal
+                val id = userDetails.getId()
+                val email = userDetails.username
                 val role =
                     userDetails.authorities.first().authority.removePrefix("ROLE_")  // Extract role without "ROLE_" prefix
 

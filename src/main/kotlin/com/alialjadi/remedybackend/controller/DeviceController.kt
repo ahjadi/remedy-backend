@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController
 class DeviceController(private val prescriberService: PrescriberService, private val patientService: PatientService) {
 
 
+    // retrieve
 
     // Retrieve state
     @Operation(

@@ -16,9 +16,19 @@ class PatientService(
     private val patientRepository: PatientRepository,
     private val passwordEncoder: PasswordEncoder
 ) {
+    fun validateFullName(fullName: String) {
+        val trimmed = fullName.trim()
+        require(trimmed.isNotBlank()) { "Name cannot be blank" }
+        require(trimmed.length >= 3) { "Name should be more than 2 characters" }
+        require(!trimmed.any { it.isDigit() }) { "Name should not contain any digits" }
+        require(trimmed.matches(Regex("^[a-zA-Z\\s'-]+$"))) {
+            "Name can only contain letters, spaces, hyphens, and apostrophes"
+        }
+    }
 
     // create new patient user
     fun createPatient(patientRequest: PatientRequest): PatientIdRequest {
+      validateFullName(patientRequest.name)
         val newPatientEntity = PatientEntity(
             prescriberId = patientRequest.prescriberId,
             name = patientRequest.name,
