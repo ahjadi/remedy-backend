@@ -12,12 +12,10 @@ import jakarta.persistence.EntityNotFoundException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.annotation.AuthenticationPrincipal
-import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import java.time.format.DateTimeParseException
 
 @RestController
 @RequestMapping("/api/patient")
@@ -34,14 +32,7 @@ class PatientController(
     )
     @PostMapping("/create")
     fun createNewPatient(@RequestBody patientRequest: PatientRequest): ResponseEntity<Any> {
-        return try {
-            ResponseEntity.ok().body(patientService.createPatient(patientRequest))
-        } catch (e: DateTimeParseException) {
-            ResponseEntity.badRequest().body(e.message)
-        } catch (e: Exception) {
-            ResponseEntity.badRequest()
-                .body("Check if Email already in use and in proper format | DoB format: dd-MM-yyyy")
-        }
+        return ResponseEntity.ok().body(patientService.createPatient(patientRequest))
     }
 
     @Operation(

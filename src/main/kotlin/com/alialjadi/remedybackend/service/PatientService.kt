@@ -26,9 +26,17 @@ class PatientService(
         }
     }
 
+    fun validatePassword(password: String) {
+        require(password.length >= 8) { "Password must be at least 8 characters long" }
+        require(password.any { it.isUpperCase() }) { "Password must contain at least one uppercase letter" }
+        require(password.any { it.isDigit() }) { "Password must contain at least one number" }
+    }
+
     // create new patient user
     fun createPatient(patientRequest: PatientRequest): PatientIdRequest {
-      validateFullName(patientRequest.name)
+        validateFullName(patientRequest.name)
+        validatePassword(patientRequest.password)
+
         val newPatientEntity = PatientEntity(
             prescriberId = patientRequest.prescriberId,
             name = patientRequest.name,
@@ -39,7 +47,7 @@ class PatientService(
             faceImagePath = patientRequest.faceImagePath,
         )
         patientRepository.save(newPatientEntity)
-        val patientId : UUID? = newPatientEntity.id
+        val patientId: UUID? = newPatientEntity.id
         return PatientIdRequest(patientId!!)
     }
 
@@ -62,7 +70,7 @@ class PatientService(
         val patient = patientRepository.findById(request.patientId)
             .orElseThrow { EntityNotFoundException("No patient found for id ${request.patientId}") }
 
-       patient.faceImagePath = request.photoPath
+        patient.faceImagePath = request.photoPath
 
         patientRepository.save(patient)
     }
