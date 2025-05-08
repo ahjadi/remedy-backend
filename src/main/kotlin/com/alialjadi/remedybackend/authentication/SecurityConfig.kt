@@ -4,6 +4,7 @@ import com.alialjadi.remedybackend.authentication.device.DeviceApiKeyFilter
 import com.alialjadi.remedybackend.authentication.jwt.JwtAuthenticationFilter
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.core.annotation.Order
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.AuthenticationProvider
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider
@@ -24,7 +25,6 @@ class SecurityConfig(
     private val userDetailsService: UserDetailsService,
     private val deviceApiKeyFilter: DeviceApiKeyFilter
 ) {
-    // For authorization, you need to add code in security config, customuserdetails, and jwtservice
     @Bean
     fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
         http.csrf { it.disable() }
@@ -35,33 +35,38 @@ class SecurityConfig(
 
             .authorizeHttpRequests {
                 it
-//                    .anyRequest().permitAll()  // permit all
+                    // Swagger UI & OpenAPI
+                    .requestMatchers(
+                        "/v3/api-docs",
+                      "/api-docs"
+                    ).permitAll()
 
+                    // Your existing permitted endpoints
                     .requestMatchers(
                         "/auth/login",
-                        "/api/prescriber/create", "/api/patient/create",
-                        "api-docs"
+                        "/api/prescriber/create",
+                        "/api/patient/create",
+                        "/api-docs"
                     ).permitAll()
+
                     // Device endpoints - require ROLE_DEVICE
                     .requestMatchers("/api/device/**").hasRole("DEVICE")
                     .requestMatchers("/api/prescriber/**").hasRole("PRESCRIBER")
                     .requestMatchers("/api/patient/**").hasRole("PATIENT")
-                    .anyRequest()
-                    .authenticated()
+
+                    .anyRequest().authenticated()
             }
             .sessionManagement {
                 it.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             }
             .authenticationProvider(authenticationProvider())
-            // JWT filter for patient/doctor authentication
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter::class.java)
-            // API key filter for device authentication
             .addFilterBefore(deviceApiKeyFilter, UsernamePasswordAuthenticationFilter::class.java)
-
 
         return http.build()
     }
 
+    // Your other beans remain the same
     @Bean
     fun passwordEncoder(): PasswordEncoder = BCryptPasswordEncoder()
 
