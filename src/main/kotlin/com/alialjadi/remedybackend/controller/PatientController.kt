@@ -44,15 +44,10 @@ class PatientController(
         @AuthenticationPrincipal patient: UserPrincipal,
         @RequestBody request: PhotoUploadRequest
     ): ResponseEntity<Any> {
-        return try {
-            if (patient.getPatientId() != request.patientId) {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Patient Id does not match request.")
-            }
-            ResponseEntity.ok().body(patientService.uploadPhoto(request))
-        } catch (e: EntityNotFoundException) {
-            ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(mapOf("error" to "no patient found for id ${request.patientId}"))
+        if (patient.getPatientId() != request.patientId) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Patient Id does not match request.")
         }
+        return ResponseEntity.ok().body(patientService.uploadPhoto(request))
     }
 
     @Operation(
@@ -64,15 +59,10 @@ class PatientController(
         @AuthenticationPrincipal patient: UserPrincipal,
         @RequestBody patientId: PatientIdRequest
     ): ResponseEntity<Any> {
-        return try {
-            if (patient.getPatientId() != patientId.patientId) {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Patient Id does not match request.")
-            }
-            ResponseEntity.ok().body(patientService.retrievePatient(patientId.patientId))
-        } catch (e: EntityNotFoundException) {
-            ResponseEntity.badRequest().body(mapOf("error" to e.message))
+        if (patient.getPatientId() != patientId.patientId) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Patient Id does not match request.")
         }
-
+        return ResponseEntity.ok().body(patientService.retrievePatient(patientId.patientId))
     }
 
     //    view patient and bag
@@ -85,13 +75,9 @@ class PatientController(
         @AuthenticationPrincipal patient: UserPrincipal,
         @RequestBody patientId: PatientIdRequest
     ): ResponseEntity<Any> {
-        return try {
-            if (patient.getPatientId() != patientId.patientId) {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Patient Id does not match request.")
-            }
-            ResponseEntity.ok().body(prescriberService.viewBag(patientId))
-        } catch (e: EntityNotFoundException) {
-            ResponseEntity.status(HttpStatus.NOT_FOUND).body(mapOf("error" to e.message))
+        if (patient.getPatientId() != patientId.patientId) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Patient Id does not match request.")
         }
+        return ResponseEntity.ok().body(prescriberService.viewBag(patientId))
     }
 }

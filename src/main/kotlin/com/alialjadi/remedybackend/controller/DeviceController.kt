@@ -7,9 +7,6 @@ import com.alialjadi.remedybackend.service.PatientService
 import com.alialjadi.remedybackend.service.PrescriberService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
-import jakarta.persistence.EntityNotFoundException
-import jakarta.transaction.Transactional
-import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -32,11 +29,8 @@ class DeviceController(private val prescriberService: PrescriberService, private
     @PostMapping("get/bag/state")
     fun getBagState(@RequestBody patientId: PatientIdRequest): ResponseEntity<Any> {
 
-        return try {
-            ResponseEntity.ok().body(prescriberService.getState(patientId))
-        } catch (e: EntityNotFoundException) {
-            ResponseEntity.status(HttpStatus.NOT_FOUND).body(mapOf("error" to e.message))
-        }
+        return ResponseEntity.ok().body(prescriberService.getState(patientId))
+
     }
 
 
@@ -50,11 +44,8 @@ class DeviceController(private val prescriberService: PrescriberService, private
     @PostMapping("bag/set/state")
     fun setBagState(@RequestBody newState: SetBagState): ResponseEntity<Any> {
 
-        return try {
-            ResponseEntity.ok().body(prescriberService.setBagState(newState))
-        } catch (e: EntityNotFoundException) {
-            ResponseEntity.status(HttpStatus.NOT_FOUND).body(mapOf("error" to e.message))
-        }
+        return ResponseEntity.ok().body(prescriberService.setBagState(newState))
+
     }
 
     @Operation(
@@ -63,11 +54,7 @@ class DeviceController(private val prescriberService: PrescriberService, private
     )
     @PostMapping("/retrieve/patient")
     fun retrievePatient(@RequestBody patientId: PatientIdRequest): ResponseEntity<Any> {
-        return try {
-            ResponseEntity.ok().body(patientService.retrievePatient(patientId.patientId))
-        } catch (e: EntityNotFoundException) {
-            ResponseEntity.badRequest().body(mapOf("error" to e.message))
-        }
+        return ResponseEntity.ok().body(patientService.retrievePatient(patientId.patientId))
     }
 
 
@@ -77,11 +64,8 @@ class DeviceController(private val prescriberService: PrescriberService, private
     )
     @PostMapping("/retrieve/prescriber")
     fun retrievePrescriber(@RequestBody prescriberId: PrescriberIdRequest): ResponseEntity<Any> {
-        return try {
-            ResponseEntity.ok().body(prescriberService.retrievePrescriber(prescriberId.prescriberId))
-        } catch (e: EntityNotFoundException) {
-            ResponseEntity.badRequest().body(mapOf("error" to e.message))
-        }
+        return ResponseEntity.ok().body(prescriberService.retrievePrescriber(prescriberId.prescriberId))
+
 
     }
 }
