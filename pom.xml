@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.alialjadi</groupId>
     <artifactId>remedy-backend</artifactId>
-    <version>1.0.5</version>
+    <version>1.0.7</version>
     <name>remedy-backend</name>
     <description>remedy-backend</description>
     <url/>
@@ -65,6 +65,14 @@
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-webmvc-api</artifactId>
             <version>2.6.0</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/com.google.firebase/firebase-admin -->
+        <!-- https://mvnrepository.com/artifact/com.google.firebase/firebase-admin -->
+        <dependency>
+            <groupId>com.google.firebase</groupId>
+            <artifactId>firebase-admin</artifactId>
+            <version>9.4.3</version>
         </dependency>
 
         <dependency>
@@ -123,6 +131,11 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.jetbrains.kotlinx</groupId>
+            <artifactId>kotlinx-coroutines-core</artifactId>
+            <version>1.8.1</version>
         </dependency>
 
 

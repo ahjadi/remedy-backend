@@ -9,7 +9,12 @@ import com.alialjadi.remedybackend.repository.PatientRepository
 import com.alialjadi.remedybackend.repository.PrescriberRepository
 import jakarta.persistence.EntityNotFoundException
 import jakarta.transaction.Transactional
+import jakarta.xml.bind.JAXBElement
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.springframework.http.ResponseEntity
+import org.springframework.scheduling.annotation.Async
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import java.util.*
@@ -21,7 +26,8 @@ class PrescriberService(
     private val passwordEncoder: PasswordEncoder,
     private val patientRepository: PatientRepository,
     private val bagRepository: BagRepository,
-    private val historyService: MedicationHistoryService
+    private val historyService: MedicationHistoryService,
+    private val notificationService: NotificationService,
 ) {
 
     fun validateFullName(fullName: String) {
@@ -164,9 +170,56 @@ class PrescriberService(
 
             if (originalState != newBageState.bagState) {
                 historyService.recordStateChange(updatedBag, newBageState.bagState, newBageState.prescriberId)
+                val prescriberId = patientRepository.findById(newBageState.patientId).get().prescriberId ?: throw EntityNotFoundException("No bag found for id ${newBageState.patientId}")
+
+                handleStateChangeNotification(updatedBag, prescriberId)
+
             }
 
         }
+    fun handleStateChangeNotification(bag: BagEntity, prescriberId: UUID) {
+        val patientName = patientRepository.findById(bag.patientId!!).get().name.substringBefore(" ")
+        when (bag.state) {
+            BagState.SEALED -> notificationService.sendToPatient(
+                bag.patientId!!,
+                "Hello $patientName!",
+                "Remedy is preparing your prescription..."
+            )
+            BagState.LOADED -> {
+                notificationService.sendToPatient(
+                    bag.patientId!!,
+                    "Remedy is Ready!",
+                    "Your prescription [${bag.prescription}] is ready for pickup. Please pick it up within 24hrs."
+                )
+                checkLoadedDuration(bag, prescriberId)
+            }
+            BagState.DISCARDED -> notificationService.sendToPatient(
+                bag.patientId!!,
+                "You missed it :(",
+                "Your prescription [${bag.prescription}] has been removed from Remedy."
+            )
+            BagState.DISPENSED -> notificationService.sendToPrescriber(
+                prescriberId,
+                "Prescription Picked Up",
+                "Patient [with ID: ${bag.patientId}] has picked up their prescription [${bag.prescription}]."
+            )
+            else -> {}
+        }
+    }
+    @Async
+    fun checkLoadedDuration(bag: BagEntity, prescriberId: UUID) {
+        GlobalScope.launch {
+            delay(24 * 60 * 60 * 1000) // 24 hours
+            val latestBag = bagRepository.findById(bag.id!!).orElse(null)
+            if (latestBag?.state == BagState.LOADED) {
+                notificationService.sendToPrescriber(
+                    prescriberId,
+                    "Prescription Expired",
+                    "Please remove prescription for patient ID: ${bag.patientId}"
+                )
+            }
+        }
+    }
 
 
         // for prescriber: returns info of patient and their bag

@@ -17,6 +17,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
+import org.springframework.web.client.RestTemplate
 
 @Configuration
 @EnableWebSecurity
@@ -35,24 +36,21 @@ class SecurityConfig(
 
             .authorizeHttpRequests {
                 it
-                    // Swagger UI & OpenAPI
+
                     .requestMatchers(
                         "/v3/api-docs",
-                      "/api-docs"
-                    ).permitAll()
-
-                    // Your existing permitted endpoints
-                    .requestMatchers(
-                        "/auth/login",
+                      "/api-docs",   "/auth/login",
                         "/api/prescriber/create",
                         "/api/patient/create",
-                        "/api-docs"
-                    ).permitAll()
+                        "/api-docs").permitAll()
+                    .requestMatchers("/api/notifications/**").authenticated()
 
                     // Device endpoints - require ROLE_DEVICE
                     .requestMatchers("/api/device/**").hasRole("DEVICE")
                     .requestMatchers("/api/prescriber/**").hasRole("PRESCRIBER")
                     .requestMatchers("/api/patient/**").hasRole("PATIENT")
+
+
 
                     .anyRequest().authenticated()
             }

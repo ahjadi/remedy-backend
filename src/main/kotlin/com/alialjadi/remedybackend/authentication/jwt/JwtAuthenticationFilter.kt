@@ -2,11 +2,9 @@ package com.alialjadi.remedybackend.authentication.jwt
 
 import com.alialjadi.remedybackend.authentication.CustomUserDetailsService
 import com.alialjadi.remedybackend.authentication.UserPrincipal
-import com.alialjadi.remedybackend.encryption.EncryptionService
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
-import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource

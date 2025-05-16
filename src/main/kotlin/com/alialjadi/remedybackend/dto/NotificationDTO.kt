@@ -1,10 +1,8 @@
 package com.alialjadi.remedybackend.dto
 
-import com.alialjadi.remedybackend.entity.BagEntity
-import com.alialjadi.remedybackend.entity.PrescriberEntity
 import java.util.UUID
 
-data class PullNotification(
+data class NotificationDTO(
 
     val patientId: UUID,
     val patientName: String,
@@ -21,3 +19,10 @@ data class PullNotification(
     val prescriberEmail: String? = null,
     val prescriberPhoneNumber: String? = null,
     )
+
+
+data class NotificationRequest(
+    val token: String,
+    val title: String,
+    val body: String
+)
