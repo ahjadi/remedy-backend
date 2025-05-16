@@ -88,3 +88,9 @@ ALTER TABLE bags
 
 alter table prescribers
     add phone text;
+
+alter table patients
+    add fcm_token text default null;
+
+alter table prescribers
+    add fcm_token text default null;
