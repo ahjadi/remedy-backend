@@ -31,5 +31,7 @@ data class PrescriberEntity(
         message = "Enter a valid Kuwaiti phone number"
     )
     val phone: String,
+
+    var fcmToken: String? = null,
 ) {
 }

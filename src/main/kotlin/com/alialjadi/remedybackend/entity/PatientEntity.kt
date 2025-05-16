@@ -42,7 +42,9 @@ data class PatientEntity(
     @Convert(converter = EncryptedStringConverter::class)
     var faceImagePath: String? = null,
 
-    val role: String = "PATIENT"
+    val role: String = "PATIENT",
+
+    var fcmToken: String? = null
 
 )
 
