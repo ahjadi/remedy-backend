@@ -4,6 +4,9 @@ import com.alialjadi.remedybackend.authentication.UserPrincipal
 import com.alialjadi.remedybackend.dto.*
 import com.alialjadi.remedybackend.entity.BagEntity
 import com.alialjadi.remedybackend.entity.BagState
+import com.alialjadi.remedybackend.entity.RequestStatus
+import com.alialjadi.remedybackend.repository.BagRepository
+import com.alialjadi.remedybackend.repository.RepeatRequestRepository
 import com.alialjadi.remedybackend.service.MedicationHistoryService
 import com.alialjadi.remedybackend.service.PatientService
 import com.alialjadi.remedybackend.service.PrescriberService
@@ -13,6 +16,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.server.ResponseStatusException
 import java.util.*
 
 @RestController
@@ -23,7 +27,54 @@ class PrescriberController(
     private val prescriberService: PrescriberService,
     private val historyService: MedicationHistoryService,
     private val patientService: PatientService,
+    private val bagRepository: BagRepository,
+    private val repeatRequestRepository: RepeatRequestRepository,
 ) {
+    @GetMapping("repeat-requests/all")
+    fun getAllRepeatRequests(): ResponseEntity<List<RepeatRequestResponse>> {
+        val repeatRequests = repeatRequestRepository.findAll()
+            .map {
+                RepeatRequestResponse(
+                    id = it.id ?: -1,
+                    bagId = it.bagId,
+                    status = it.status,
+                )
+            }
+
+        return ResponseEntity.ok(repeatRequests)
+    }
+
+    data class RepeatRequestResponse(
+        val id: Long,
+        val bagId: UUID?,
+        val status: RequestStatus,
+    )
+    @PostMapping("/toggle-is-repeat")
+    fun toggleIsRepeat(@RequestBody request: ToggleIsRepeatRequest): ResponseEntity<String> {
+        val bag = bagRepository.findById(request.bagId)
+            .orElseThrow { ResponseStatusException(HttpStatus.NOT_FOUND, "Bag not found") }
+
+        // Update bag's repeat status
+        bag.isRepeat = request.isRepeat
+        bagRepository.save(bag)
+
+        // Check for associated repeat request and update its status
+        val repeatRequest = repeatRequestRepository.findByBagId(request.bagId)
+        if (repeatRequest != null) {
+            repeatRequest.status = if (request.isRepeat) RequestStatus.APPROVED else RequestStatus.REJECTED
+            repeatRequestRepository.save(repeatRequest)
+        }
+
+        return ResponseEntity.ok(
+            "Bag isRepeat set to ${request.isRepeat} for bag ID ${request.bagId}" +
+                    (if (repeatRequest != null) " and request status set to ${repeatRequest.status}" else "")
+        )
+    }
+
+    data class ToggleIsRepeatRequest(
+        val bagId: UUID,
+        val isRepeat: Boolean
+    )
 
     @Operation(summary = "Delete a patient by ID", description = "Deletes a patient if the patient ID exists.")
     @DeleteMapping("/remove/{patientId}")

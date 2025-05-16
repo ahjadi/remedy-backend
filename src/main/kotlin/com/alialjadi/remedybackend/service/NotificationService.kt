@@ -40,12 +40,12 @@ class NotificationService(
     }
 
     fun sendToPatient(patientId: UUID, title: String, body: String) {
-        val token = patientRepository.findById(patientId).get().fcmToken ?: throw EntityNotFoundException("Token not found with ID: $patientId")
+        val token = patientRepository.findById(patientId).get().fcmToken ?: throw EntityNotFoundException("FCM Token not found with ID: $patientId")
         sendFcmMessage(token, title, body)
     }
 
     fun sendToPrescriber(prescriberId: UUID, title: String, body: String) {
-        val token = prescriberRepository.findById(prescriberId).get().fcmToken ?: throw EntityNotFoundException("Token not found with ID: $prescriberId")
+        val token = prescriberRepository.findById(prescriberId).get().fcmToken ?: throw EntityNotFoundException("FCM Token not found with ID: $prescriberId")
         sendFcmMessage(token, title, body)
     }
 
@@ -62,33 +62,4 @@ class NotificationService(
 
         FirebaseMessaging.getInstance().sendAsync(message)
     }
-
-
-//    fun getPullNotifications(): List<Notification> {
-//        val patients = patientRepository.findAll()
-//
-//        return patients.map { patient ->
-//            val latestBag = bagRepository.findTopByPatientIdOrderByCreatedAtDesc(patient.id)
-//            val prescriber = patient.prescriberId?.let { prescriberRepository.findById(it).orElse(null) }
-//
-//            NotificationDTO(
-//                patientId = patient.id!!,
-//                patientName = patient.name,
-//                patientDoB = patient.dob,
-//                patientEmail = patient.email,
-//                patientPhoneNumber = patient.phone,
-//
-//                bagId = latestBag?.id,
-//                bagPrescription = latestBag?.prescription,
-//                bagState = latestBag?.state?.name,
-//
-//                prescriberId = prescriber?.id,
-//                prescriberName = prescriber?.name,
-//                prescriberEmail = prescriber?.email,
-//                prescriberPhoneNumber = prescriber?.phone
-//            )
-//        }
-
-
-
 }

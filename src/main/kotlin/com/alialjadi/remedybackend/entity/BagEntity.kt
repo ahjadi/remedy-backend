@@ -22,6 +22,8 @@ data class BagEntity(
     var state: BagState = BagState.UNSEALED,
 
     val createdAt: Instant = Instant.now(),
+
+    var  isRepeat : Boolean = false
     )
 
 enum class BagState {

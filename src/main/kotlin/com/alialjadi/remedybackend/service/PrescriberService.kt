@@ -9,11 +9,9 @@ import com.alialjadi.remedybackend.repository.PatientRepository
 import com.alialjadi.remedybackend.repository.PrescriberRepository
 import jakarta.persistence.EntityNotFoundException
 import jakarta.transaction.Transactional
-import jakarta.xml.bind.JAXBElement
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import org.springframework.http.ResponseEntity
 import org.springframework.scheduling.annotation.Async
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
@@ -158,24 +156,29 @@ class PrescriberService(
 
         // for prescriber and device: updates the state of the bag
         @Transactional
-        fun setBagState(newBageState: SetBagState) {
-
-            val bag = bagRepository.findByPatientId(newBageState.patientId)
-                ?: throw EntityNotFoundException("No bag found for patient id ${newBageState.patientId}")
+        fun setBagState(newBagState: SetBagState) {
+            val bag = bagRepository.findByPatientId(newBagState.patientId)
+                ?: throw EntityNotFoundException("No bag found for patient id ${newBagState.patientId}")
 
             val originalState = bag.state
-            bag.state = newBageState.bagState
 
-            val updatedBag = bagRepository.save(bag)
-
-            if (originalState != newBageState.bagState) {
-                historyService.recordStateChange(updatedBag, newBageState.bagState, newBageState.prescriberId)
-                val prescriberId = patientRepository.findById(newBageState.patientId).get().prescriberId ?: throw EntityNotFoundException("No bag found for id ${newBageState.patientId}")
-
-                handleStateChangeNotification(updatedBag, prescriberId)
-
+            // ✅ Only check repeat status when trying to change to UNSEALED
+            if (newBagState.bagState == BagState.UNSEALED && !bag.isRepeat) {
+                throw IllegalStateException("This bag is not eligible for repeat prescriptions and cannot be unsealed again.")
             }
 
+            bag.state = newBagState.bagState
+            val updatedBag = bagRepository.save(bag)
+
+            if (originalState != newBagState.bagState) {
+                historyService.recordStateChange(updatedBag, newBagState.bagState, newBagState.prescriberId)
+
+                val prescriberId = patientRepository.findById(newBagState.patientId)
+                    .orElseThrow { EntityNotFoundException("No patient found for id ${newBagState.patientId}") }
+                    .prescriberId ?: throw EntityNotFoundException("No prescriber assigned to patient ${newBagState.patientId}")
+
+                handleStateChangeNotification(updatedBag, prescriberId)
+            }
         }
     fun handleStateChangeNotification(bag: BagEntity, prescriberId: UUID) {
         val patientName = patientRepository.findById(bag.patientId!!).get().name.substringBefore(" ")

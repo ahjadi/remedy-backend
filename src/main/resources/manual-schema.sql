@@ -94,3 +94,19 @@ alter table patients
 
 alter table prescribers
     add fcm_token text default null;
+
+
+alter table bags
+    add is_repeat boolean default false;
+
+CREATE TABLE repeat_request (
+                                id SERIAL PRIMARY KEY,
+                                bag_id uuid NOT NULL UNIQUE,
+                                status TEXT NOT NULL,
+                                request_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+                                CONSTRAINT fk_bag
+                                    FOREIGN KEY (bag_id)
+                                        REFERENCES bags(id)
+                                        ON DELETE CASCADE
+);
