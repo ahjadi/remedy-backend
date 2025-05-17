@@ -8,18 +8,16 @@ import com.alialjadi.remedybackend.repository.RepeatRequestRepository
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
-import org.springframework.security.access.prepost.PreAuthorize
-import org.springframework.security.authorization.AuthorityAuthorizationManager.hasRole
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.server.ResponseStatusException
-import java.util.UUID
+import java.time.LocalDateTime
+import java.util.*
 
 @RestController
-@Tag(name = "For Patients Repeat Request API")
+@Tag(name = "For Patients: Repeat Request API")
 @RequestMapping("/api/repeat")
 class RepeatRequestController(
     private val bagRepository: BagRepository,
@@ -52,7 +50,6 @@ class RepeatRequestController(
     }
 
     data class RequestDTO(val patientId: UUID)
-
 
 
 }
