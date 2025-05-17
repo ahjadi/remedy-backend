@@ -40,10 +40,12 @@ class RepeatRequestController(
 
         val oldRepeatRequest: RepeatRequestEntity? = repeatRequestRepository.findByBagId(bag.id!!)
 
-        // Create and save repeat request
-        val repeatRequest : RepeatRequestEntity = oldRepeatRequest?.copy(status = RequestStatus.PENDING) ?: RepeatRequestEntity(
-            bagId = bag.id,
-        )
+        // Create or update, then save repeat request
+        val repeatRequest: RepeatRequestEntity =
+            oldRepeatRequest?.copy(status = RequestStatus.PENDING, requestDate = LocalDateTime.now())
+                ?: RepeatRequestEntity(
+                    bagId = bag.id,
+                )
         repeatRequestRepository.save(repeatRequest)
 
         return ResponseEntity.ok("Repeat request submitted successfully.")
