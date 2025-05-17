@@ -1,6 +1,7 @@
 package com.alialjadi.remedybackend.controller
 
 import com.alialjadi.remedybackend.entity.RepeatRequestEntity
+import com.alialjadi.remedybackend.entity.RequestStatus
 import com.alialjadi.remedybackend.repository.BagRepository
 import com.alialjadi.remedybackend.repository.PatientRepository
 import com.alialjadi.remedybackend.repository.RepeatRequestRepository
@@ -29,7 +30,7 @@ class RepeatRequestController(
 
     @PostMapping("/request")
     fun submitRepeatRequest(@RequestBody patientId: RequestDTO): ResponseEntity<String> {
-        // Find patient by UUID
+        // Find patient
         val patient = patientRepository.findById(patientId.patientId)
             .orElseThrow { ResponseStatusException(HttpStatus.NOT_FOUND, "Patient not found") }
 
@@ -37,14 +38,10 @@ class RepeatRequestController(
         val bag = bagRepository.findByPatientId(patientId.patientId)
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "No bag found for patient")
 
-        // Check if repeat request already exists for this bag
-        if (repeatRequestRepository.existsByBagId(bag.id)) {
-            return ResponseEntity.status(HttpStatus.CONFLICT)
-                .body("Repeat request already submitted for this bag.")
-        }
+        val oldRepeatRequest: RepeatRequestEntity? = repeatRequestRepository.findByBagId(bag.id!!)
 
         // Create and save repeat request
-        val repeatRequest = RepeatRequestEntity(
+        val repeatRequest : RepeatRequestEntity = oldRepeatRequest?.copy(status = RequestStatus.PENDING) ?: RepeatRequestEntity(
             bagId = bag.id,
         )
         repeatRequestRepository.save(repeatRequest)

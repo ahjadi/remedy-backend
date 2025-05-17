@@ -12,7 +12,7 @@ import java.util.UUID
 
 @Entity
 @Table(name = "repeat_request")
-class RepeatRequestEntity (
+data class RepeatRequestEntity (
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
