@@ -150,6 +150,7 @@ class PrescriberService(
                 ?: throw EntityNotFoundException("No bag found for patient id ${newPrescription.patientId}")
 
             bag.prescription = newPrescription.prescription
+            bag.state = BagState.UNSEALED
 
             bagRepository.save(bag)
         }
