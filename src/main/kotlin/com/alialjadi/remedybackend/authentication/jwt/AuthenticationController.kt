@@ -22,16 +22,16 @@ class AuthenticationController(
     @PostMapping("/login")
 
     fun login(@RequestBody authRequest: AuthenticationRequest): AuthenticationResponse {
-        val authToken = UsernamePasswordAuthenticationToken(authRequest.username, authRequest.password)
+        val authToken = UsernamePasswordAuthenticationToken(authRequest.username.lowercase(), authRequest.password)
         val authentication = authenticationManager.authenticate(authToken)
 
         if (authentication.isAuthenticated) {
-            val userDetails = userDetailsService.loadUserByUsername(authRequest.username)
+            val userDetails = userDetailsService.loadUserByUsername(authRequest.username.lowercase())
 
             // Ensure userDetails is of type UserPrincipal
             if (userDetails is UserPrincipal) {
                 val id = userDetails.getId()
-                val email = userDetails.username
+                val email = userDetails.username.lowercase()
                 val role =
                     userDetails.authorities.first().authority.removePrefix("ROLE_")  // Extract role without "ROLE_" prefix
 
