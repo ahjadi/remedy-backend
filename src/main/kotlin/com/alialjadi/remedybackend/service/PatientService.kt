@@ -32,7 +32,6 @@ class PatientService(
         require(password.any { it.isDigit() }) { "Password must contain at least one number" }
     }
 
-    // create new patient user
     fun createPatient(patientRequest: PatientRequest): PatientIdRequest {
         validateFullName(patientRequest.name)
         validatePassword(patientRequest.password)
@@ -41,7 +40,7 @@ class PatientService(
             prescriberId = patientRequest.prescriberId,
             name = patientRequest.name,
             dob = patientRequest.dob,
-            email = patientRequest.email,
+            email = patientRequest.email.lowercase(),
             phone = patientRequest.phone,
             password = passwordEncoder.encode(patientRequest.password),
             faceImagePath = patientRequest.faceImagePath,

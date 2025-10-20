@@ -103,7 +103,7 @@ class PrescriberService(
 
             val newPrescriberEntity = PrescriberEntity(
                 name = prescriber.name,
-                email = prescriber.email,
+                email = prescriber.email.lowercase(),
                 password = passwordEncoder.encode(prescriber.password),
                 phone = prescriber.phone,
             )
@@ -137,7 +137,7 @@ class PrescriberService(
 
             val existingBag = bagRepository.findByPatientId(bag.patientId)
 
-            val bagToSave = existingBag?.copy(prescription = bag.prescription)
+            val bagToSave = existingBag?.copy(prescription = bag.prescription, state = BagState.UNSEALED)
                 ?: BagEntity(patientId = bag.patientId, prescription = bag.prescription)
 
             bagRepository.save(bagToSave)
@@ -148,6 +148,7 @@ class PrescriberService(
 
             val bag = bagRepository.findByPatientId(newPrescription.patientId)
                 ?: throw EntityNotFoundException("No bag found for patient id ${newPrescription.patientId}")
+
 
             bag.prescription = newPrescription.prescription
             bag.state = BagState.UNSEALED
