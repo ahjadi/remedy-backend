@@ -156,7 +156,7 @@ class PrescriberService(
             bagRepository.save(bag)
         }
 
-        // for prescriber and device: updates the state of the bag
+        // for prescriber: updates the state of the bag
         @Transactional
         fun setBagState(newBagState: SetBagState) {
             val bag = bagRepository.findByPatientId(newBagState.patientId)
@@ -164,7 +164,7 @@ class PrescriberService(
 
             val originalState = bag.state
 
-            // ✅ Only check repeat status when trying to change to UNSEALED
+            // Only check repeat status when trying to change to UNSEALED
             if (newBagState.bagState == BagState.UNSEALED && !bag.isRepeat) {
                 throw IllegalStateException("This bag is not eligible for repeat prescriptions and cannot be unsealed again.")
             }
@@ -182,6 +182,32 @@ class PrescriberService(
                 handleStateChangeNotification(updatedBag, prescriberId)
             }
         }
+    @Transactional
+    fun setBagStateDevice(newBagState: DeviceSetBagState) {
+        val bag = bagRepository.findByPatientId(newBagState.patientId)
+            ?: throw EntityNotFoundException("No bag found for patient id ${newBagState.patientId}")
+
+        val originalState = bag.state
+
+        // Only check repeat status when trying to change to UNSEALED
+        if (newBagState.bagState == BagState.UNSEALED && !bag.isRepeat) {
+            throw IllegalStateException("This bag is not eligible for repeat prescriptions and cannot be unsealed again.")
+        }
+
+        bag.state = newBagState.bagState
+        val updatedBag = bagRepository.save(bag)
+
+        val prescriberId = patientRepository.findById(newBagState.patientId)
+            .orElseThrow { EntityNotFoundException("No patient found for id ${newBagState.patientId}") }
+            .prescriberId ?: throw EntityNotFoundException("No prescriber assigned to patient ${newBagState.patientId}")
+
+        if (originalState != newBagState.bagState) {
+            historyService.recordStateChange(updatedBag, newBagState.bagState, prescriberId)
+
+            handleStateChangeNotification(updatedBag, prescriberId)
+        }
+    }
+
     fun handleStateChangeNotification(bag: BagEntity, prescriberId: UUID) {
         val patientName = patientRepository.findById(bag.patientId!!).get().name.substringBefore(" ")
         when (bag.state) {

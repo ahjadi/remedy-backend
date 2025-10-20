@@ -21,6 +21,13 @@ data class SetBagState(
     val bagState: BagState
 )
 
+data class DeviceSetBagState(
+    val patientId: UUID,
+    val bagState: BagState
+)
+
+
+
 
 
 data class PatientBagState(
