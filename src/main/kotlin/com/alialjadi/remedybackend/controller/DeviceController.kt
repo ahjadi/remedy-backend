@@ -1,5 +1,6 @@
 package com.alialjadi.remedybackend.controller
 
+import com.alialjadi.remedybackend.dto.DeviceSetBagState
 import com.alialjadi.remedybackend.dto.PatientIdRequest
 import com.alialjadi.remedybackend.dto.PrescriberIdRequest
 import com.alialjadi.remedybackend.dto.SetBagState
@@ -44,9 +45,9 @@ class DeviceController(
                 "Quite powerful as it overrides any state and could break the machine logic"
     )
     @PostMapping("bag/set/state")
-    fun setBagState(@RequestBody newState: SetBagState): ResponseEntity<Any> {
+    fun setBagState(@RequestBody newState: DeviceSetBagState): ResponseEntity<Any> {
 
-        return ResponseEntity.ok().body(prescriberService.setBagState(newState))
+        return ResponseEntity.ok().body(prescriberService.setBagStateDevice(newState))
 
     }
 
